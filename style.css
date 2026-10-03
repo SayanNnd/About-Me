@@ -1,0 +1,193 @@
+:root {
+      --moss: #636B2F;    
+      --sage: #BAC095; 
+      --lime: #D4DE95;     
+      --forest: #3D4127;   
+    }
+
+    
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: Montserrat;
+      line-height: 1.6;
+      background: var(--lime);
+      color: var(--forest);
+    }
+
+    a { color: inherit; }
+
+    a:focus-visible {
+      outline: 3px solid var(--moss);
+      outline-offset: 3px;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 0 1.25rem;
+    }
+
+    section { padding: 2rem 0; }
+
+    h2 {
+      font-size: 1.75rem;
+      margin-bottom: 1.5rem;
+    }
+
+    header {
+      background: var(--forest);
+      color: var(--lime);
+      position: sticky;
+      top: 0;
+			z-index: 10;
+    }
+
+    header .container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      padding-top: 1rem;
+      padding-bottom: 1rem;
+    }
+
+    .logo {
+      font-weight: 700;
+      font-size: 1.2rem;
+      text-decoration: none;
+    }
+
+    nav a {
+      margin-left: 1.25rem;
+      text-decoration: none;
+      background: linear-gradient(var(--lime), var(--lime)) no-repeat left bottom / 0 2px;
+      transition: background-size 0.25s ease;
+    }
+
+    nav a:hover,
+    nav a:focus-visible { background-size: 100% 2px; }
+
+    #about h1 {
+      font-size: 2.5rem;
+      line-height: 1.2;
+      margin-bottom: 1rem;
+    }
+
+    #about p {
+      max-width: 120ch;
+      margin-bottom: 1rem;
+    }
+
+    @keyframes fade-up {
+      from { opacity: 0; transform: translateY(14px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    #about h1,
+    #about p,
+    #about .button {
+      animation: fade-up 0.6s ease-out both;
+    }
+    #about h1 {
+			animation-delay: 0s;
+		}
+		#about p:nth-of-type(1) {
+			animation-delay: 0.15s;
+		}
+		#about p:nth-of-type(2) {
+			animation-delay: 0.3s;
+		}
+		#about p:nth-of-type(3) {
+			animation-delay: 0.45s;
+		}
+		#about p:nth-of-type(4) {
+			animation-delay: 0.6s;
+		}
+		#about .button {
+			animation-delay: 0.75s;
+		}
+
+    .button {
+      display: inline-block;
+      background: var(--moss);
+      color: var(--lime);
+      padding: 0.75rem 1.5rem;
+      border-radius: 6px;
+      text-decoration: none;
+      font-weight: 600;
+      transition: background 0.2s ease, transform 0.2s ease;
+    }
+
+    .button:hover {
+      background: var(--forest);
+      transform: translateY(-2px);
+    }
+
+    .skills {
+      list-style: none;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+    }
+
+    .skills li {
+      background: var(--sage);
+      padding: 0.4rem 1rem;
+      border-radius: 999px;
+      transition: background 0.2s ease, color 0.2s ease;
+    }
+
+    .skills li:hover {
+      background: var(--moss);
+      color: var(--lime);
+    }
+
+    .projects {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.25rem;
+    }
+
+    .project {
+      background: var(--sage);
+      border-left: 6px solid var(--moss);
+      border-radius: 6px;
+      padding: 1.25rem;
+      transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+
+    .project:hover {
+      transform: translateY(-4px);
+      border-left-color: var(--forest);
+    }
+
+    .project h3 { margin-bottom: 0.5rem; }
+    .project p { margin-bottom: 0.75rem; }
+
+    .project .tech {
+      font-size: 0.9rem;
+      color: var(--moss);
+      font-weight: 600;
+    }
+
+    .project a { font-weight: 600; }
+
+    #contact {
+      background: var(--moss);
+      color: var(--lime);
+    }
+
+    #contact ul { list-style: none; }
+    #contact li { margin-bottom: 0.5rem; }
+
+    footer {
+      background: var(--forest);
+      color: var(--sage);
+      text-align: center;
+      padding: 1.25rem;
+      font-size: 0.9rem;
+    }
