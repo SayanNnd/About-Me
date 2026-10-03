@@ -1,8 +1,8 @@
 /* ---------- Colors (Mossy hollow + accents) ---------- */
 :root {
-  --frame: #14160c;    /* the screen border and side bar background */
+  --frame: #14160c;    /* the screen border */
   --bg: #222516;       /* dark text on bright accents, terminal tint */
-  --forest: #3D4127;   /* cards, tooltips */
+  --forest: #3D4127;   /* cards, menus */
   --moss: #636B2F;     /* borders, soft highlights */
   --sage: #BAC095;     /* body text */
   --lime: #D4DE95;     /* headings */
@@ -16,36 +16,30 @@
 
   --mono: "JetBrains Mono", ui-monospace, "Cascadia Code", Consolas, monospace;
 
-  /* layout: how thick the screen border is on each side */
-  --fr: 12px;          /* top/right/bottom border */
-  --pl: 76px;          /* left side (holds the bar) */
-  --pt: 12px;          /* top */
-  --gap: 1.25rem;      /* space between the frame and the terminal */
+  /* layout */
+  --fr: 12px;          /* thickness of the screen border */
+  --gap: 1.25rem;      /* space between the border and the terminal */
 }
 
 /* ---------- Base ---------- */
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
-html {
-  scroll-behavior: smooth;
-  scroll-padding-top: calc(var(--pt) + 1rem);
-}
+html, body { height: 100%; }
 
+/* The page never scrolls. The terminal fills the screen and scrolls inside itself. */
 body {
   font-family: var(--mono);
   font-size: 16px;
   line-height: 1.7;
   color: var(--sage);
-  padding:
-    calc(var(--pt) + var(--gap))
-    calc(var(--fr) + var(--gap))
-    calc(var(--fr) + var(--gap))
-    calc(var(--pl) + var(--gap));
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+  padding: calc(var(--fr) + var(--gap));
   background: #1a1d10;
 }
 
-/* "wallpaper" that shows through the translucent terminal.
-   It lives on its own fixed layer, so scrolling doesn't repaint it. */
+/* "wallpaper" that shows through the translucent terminal */
 body::before {
   content: "";
   position: fixed;
@@ -57,15 +51,15 @@ body::before {
     radial-gradient(55rem 40rem at 40% 100%, rgba(183, 161, 230, 0.20), transparent 60%);
 }
 
-/* Screen border with rounded inner corners, like the Caelestia shell.
+/* Screen border with rounded inner corners.
    The box is the "hole"; its giant shadow paints the frame around it. */
 body::after {
   content: "";
   position: fixed;
-  inset: var(--pt) var(--fr) var(--fr) var(--pl);
+  inset: var(--fr);
   border-radius: 22px;
   box-shadow:
-    0 0 0 max(var(--pl), var(--pt)) var(--frame),
+    0 0 0 100vmax var(--frame),
     inset 0 0 0 1px rgba(212, 222, 149, 0.12);
   pointer-events: none;
   z-index: 5;
@@ -88,145 +82,16 @@ a:focus-visible {
   outline-offset: 3px;
 }
 
-/* ---------- Side bar ---------- */
-.bar {
-  position: fixed;
-  z-index: 20;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  width: var(--pl);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: space-between;
-  padding: 14px 0;
-}
+code { color: var(--amber); }
 
-.bar .mono {
-  width: 44px;
-  height: 44px;
-  display: grid;
-  place-items: center;
-  border-radius: 14px;
-  background: var(--lime);
-  color: var(--bg);
-  font-weight: 700;
-  text-decoration: none;
-  transition: border-radius 0.25s ease;
-}
-
-.bar .mono:hover { border-radius: 50%; }
-
-.bar nav {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  padding: 8px 6px;
-  border-radius: 999px;
-  background: rgba(61, 65, 39, 0.6);
-}
-
-.bar nav a {
-  position: relative;
-  width: 38px;
-  height: 38px;
-  display: grid;
-  place-items: center;
-  border-radius: 50%;
-  text-decoration: none;
-  transition: background 0.2s ease;
-}
-
-.bar nav a b { color: var(--c); }
-
-.bar nav a:hover { background: rgba(212, 222, 149, 0.14); }
-
-/* The section you clicked gets a filled pill (works with no JavaScript) */
-body:not(:has(:target)) .bar nav a[href="#top"],
-body:has(#top:target)      .bar nav a[href="#top"],
-body:has(#about:target)    .bar nav a[href="#about"],
-body:has(#skills:target)   .bar nav a[href="#skills"],
-body:has(#projects:target) .bar nav a[href="#projects"],
-body:has(#contact:target)  .bar nav a[href="#contact"] {
-  background: var(--c);
-}
-
-body:not(:has(:target)) .bar nav a[href="#top"] b,
-body:has(#top:target)      .bar nav a[href="#top"] b,
-body:has(#about:target)    .bar nav a[href="#about"] b,
-body:has(#skills:target)   .bar nav a[href="#skills"] b,
-body:has(#projects:target) .bar nav a[href="#projects"] b,
-body:has(#contact:target)  .bar nav a[href="#contact"] b {
-  color: var(--bg);
-}
-
-/* Label that pops out to the right on hover */
-.bar nav a::after,
-.bar .up::after {
-  content: attr(data-label);
-  position: absolute;
-  left: calc(100% + 14px);
-  top: 50%;
-  transform: translate(-4px, -50%);
-  padding: 0.25rem 0.8rem;
-  border-radius: 10px;
-  background: var(--forest);
-  color: var(--lime);
-  font-size: 0.8rem;
-  white-space: nowrap;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.15s ease, transform 0.15s ease;
-}
-
-.bar nav a:hover::after,
-.bar nav a:focus-visible::after,
-.bar .up:hover::after,
-.bar .up:focus-visible::after {
-  opacity: 1;
-  transform: translate(0, -50%);
-}
-
-.bar-bottom {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 10px;
-}
-
-.bar .up {
-  position: relative;
-  width: 38px;
-  height: 38px;
-  display: grid;
-  place-items: center;
-  border-radius: 50%;
-  background: rgba(61, 65, 39, 0.6);
-  color: var(--lime);
-  font-weight: 700;
-  text-decoration: none;
-}
-
-.bar .up:hover {
-  background: var(--lime);
-  color: var(--bg);
-}
-
-.bar .side {
-  writing-mode: vertical-rl;
-  transform: rotate(180deg);
-  font-size: 0.8rem;
-  letter-spacing: 0.08em;
-  color: var(--sage);
-}
-
-/* ---------- Terminal window (Hyprland style: no title bar, gradient border) ---------- */
+/* ---------- Terminal window (Hyprland style: gradient border) ---------- */
 .window {
   position: relative;
-  max-width: 1450px;
+  display: flex;
+  flex-direction: column;
+  max-width: 1600px;
+  height: 100%;
   margin: 0 auto;
-  min-height: 80vh;
   border-radius: 18px;
   background: rgba(34, 37, 22, 0.88);
 }
@@ -245,7 +110,118 @@ body:has(#contact:target)  .bar nav a[href="#contact"] b {
   pointer-events: none;
 }
 
-.screen { padding: 2.25rem 2.5rem 2.5rem; }
+/* ---------- Top strip: hint + commands dropdown ---------- */
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.8rem 1.5rem;
+  border-bottom: 1px solid rgba(99, 107, 47, 0.5);
+}
+
+.toolbar-hint {
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
+
+.dropdown { position: relative; flex: none; }
+
+.menu-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.15rem 1rem;
+  border: 1px solid var(--amber);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--amber);
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+/* little chevron that flips when the menu is open */
+.menu-btn::after {
+  content: "";
+  width: 0.45rem;
+  height: 0.45rem;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: translateY(-2px) rotate(45deg);
+  transition: transform 0.2s ease;
+}
+
+.menu-btn[aria-expanded="true"]::after { transform: translateY(2px) rotate(-135deg); }
+
+.menu-btn:hover,
+.menu-btn[aria-expanded="true"] {
+  background: var(--amber);
+  color: var(--bg);
+}
+
+.menu-btn:focus-visible {
+  outline: 2px solid var(--lime);
+  outline-offset: 3px;
+}
+
+.menu {
+  position: absolute;
+  top: calc(100% + 0.6rem);
+  right: 0;
+  z-index: 10;
+  display: grid;
+  gap: 0.1rem;
+  width: min(27rem, calc(100vw - 3rem));
+  max-height: min(60vh, 26rem);
+  overflow-y: auto;
+  padding: 0.4rem;
+  border: 1px solid var(--moss);
+  border-radius: 18px;
+  background: var(--forest);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+}
+
+.menu[hidden] { display: none; }
+
+.menu-item {
+  display: grid;
+  grid-template-columns: 9.5rem 1fr;
+  gap: 0.25rem 1rem;
+  align-items: baseline;
+  width: 100%;
+  padding: 0.4rem 0.8rem;
+  border: 0;
+  border-radius: 12px;
+  background: none;
+  color: var(--sage);
+  font: inherit;
+  font-size: 0.85rem;
+  line-height: 1.4;
+  text-align: left;
+  cursor: pointer;
+}
+
+.menu-item .mc { color: var(--amber); font-weight: 700; }
+
+.menu-item:hover,
+.menu-item:focus-visible {
+  background: rgba(212, 222, 149, 0.14);
+  outline: none;
+}
+
+/* ---------- Scrolling terminal area ---------- */
+.screen {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 1.75rem 2.5rem 2.5rem;
+  scrollbar-width: thin;
+  scrollbar-color: var(--moss) transparent;
+}
 
 /* ---------- Prompt lines (starship-style chips) ---------- */
 .prompt { margin-bottom: 0.9rem; }
@@ -295,17 +271,27 @@ body:has(#contact:target)  .bar nav a[href="#contact"] b {
   }
 }
 
-/* Blinking cursor on the last prompt */
-.cursor {
-  display: inline-block;
-  width: 0.6em;
-  height: 1.1em;
-  vertical-align: text-bottom;
-  background: var(--amber);
-  animation: blink 1s steps(1) infinite;
+/* The live prompt at the bottom */
+.input-line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  margin: 1.75rem 0 0;
 }
 
-@keyframes blink { 50% { opacity: 0; } }
+#history:empty + .input-line { margin-top: 0; }
+
+.input-line input {
+  flex: 1 1 12ch;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--amber);
+  caret-color: var(--amber);
+  font: inherit;
+}
 
 /* ---------- Fastfetch block ---------- */
 .fetch {
@@ -315,6 +301,9 @@ body:has(#contact:target)  .bar nav a[href="#contact"] b {
   align-items: center;
   animation: appear 0.5s ease-out 1s both;
 }
+
+/* when fastfetch is run again from the prompt, show it straight away */
+.fetch.now { animation: none; }
 
 @keyframes appear {
   from { opacity: 0; transform: translateY(6px); }
@@ -382,8 +371,71 @@ body:has(#contact:target)  .bar nav a[href="#contact"] b {
 .s7 { background: var(--pink); }
 .s8 { background: var(--sage); }
 
-/* ---------- Sections ---------- */
+/* ---------- Sections and command entries ---------- */
 .block { margin-top: 2.75rem; }
+
+/* entries added by typed commands sit closer together */
+.entry {
+  margin-top: 1.75rem;
+  scroll-margin-top: 0.5rem;
+}
+
+.block:first-child { margin-top: 0; }
+
+/* small helper text under outputs */
+.hint {
+  margin-top: 0.6rem;
+  font-size: 0.85rem;
+  opacity: 0.85;
+}
+
+.note {
+  margin-bottom: 0.75rem;
+  color: var(--lime);
+}
+
+.err { color: var(--coral); }
+
+/* a command shown as text that can also be clicked to run */
+.cmdlink {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.cmdlink:hover { text-decoration: underline; }
+
+.cmdlink:focus-visible {
+  outline: 2px solid var(--lime);
+  outline-offset: 3px;
+}
+
+/* ls (no arguments) */
+.files {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1.5rem;
+}
+
+.files .dir { color: var(--sky); font-weight: 700; }
+
+/* help */
+.help p {
+  display: flex;
+  flex-wrap: wrap;
+  column-gap: 1rem;
+}
+
+.help .k {
+  min-width: 20ch;
+  color: var(--amber);
+}
+
+.help .hint { margin-top: 0.75rem; }
 
 .md h1 {
   color: var(--lime);
@@ -404,11 +456,14 @@ body:has(#contact:target)  .bar nav a[href="#contact"] b {
   display: inline-block;
   margin-top: 1rem;
   padding: 0.55rem 1.4rem;
+  border: 0;
   border-radius: 999px;
   background: var(--amber);
   color: var(--bg);
+  font: inherit;
   font-weight: 700;
   text-decoration: none;
+  cursor: pointer;
   transition: background 0.2s ease, transform 0.2s ease;
 }
 
@@ -416,6 +471,11 @@ body:has(#contact:target)  .bar nav a[href="#contact"] b {
   background: var(--lime);
   color: var(--bg);
   transform: translateY(-2px);
+}
+
+.button:focus-visible {
+  outline: 2px solid var(--lime);
+  outline-offset: 3px;
 }
 
 /* ---------- Skills ---------- */
@@ -434,7 +494,6 @@ body:has(#contact:target)  .bar nav a[href="#contact"] b {
   background: rgba(255, 255, 255, 0.04);
   background: color-mix(in srgb, var(--c) 16%, transparent);
   font-weight: 700;
-  padding: 0.1rem 1rem;
   transition: background 0.2s ease, color 0.2s ease;
 }
 .ls li:nth-child(1) { --c: var(--coral); }
@@ -444,20 +503,38 @@ body:has(#contact:target)  .bar nav a[href="#contact"] b {
 .ls li:nth-child(5) { --c: var(--lavender); }
 .ls li:nth-child(6) { --c: var(--pink); }
 
+/* the button fills the whole pill so the full shape is clickable */
+.ls li button {
+  display: block;
+  padding: 0.1rem 1rem;
+  border: 0;
+  border-radius: 999px;
+  background: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.ls li button:focus-visible {
+  outline: 2px solid var(--lime);
+  outline-offset: 3px;
+}
+
 .ls li:hover {
   background: var(--c);
   color: var(--bg);
 }
 
 /* ---------- Projects ---------- */
+/* columns stop at 440px so a single filtered card doesn't stretch across the screen */
 .projects {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(260px, 440px));
   gap: 1rem;
 }
 
 .project {
-  --accent: var(--lime);
+  --accent: var(--lime);   /* each card overrides this inline in index.html */
   display: flex;
   flex-direction: column;
   gap: 0.6rem;
@@ -467,12 +544,6 @@ body:has(#contact:target)  .bar nav a[href="#contact"] b {
   border-radius: 22px;
   transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
 }
-.project:nth-child(1) { --accent: var(--coral); }
-.project:nth-child(2) { --accent: var(--teal); }
-.project:nth-child(3) { --accent: var(--lavender); }
-.project:nth-child(4) { --accent: var(--amber); }
-.project:nth-child(5) { --accent: var(--sky); }
-.project:nth-child(6) { --accent: var(--pink); }
 
 .project:hover {
   transform: translateY(-3px);
@@ -555,22 +626,113 @@ body:has(#contact:target)  .bar nav a[href="#contact"] b {
 .contact p:nth-child(1) .k { color: var(--coral); }
 .contact p:nth-child(2) .k { color: var(--sky); }
 .contact p:nth-child(3) .k { color: var(--pink); }
+.contact p:nth-child(4) .k { color: var(--amber); }
 
-.prompt.end { margin-top: 2.5rem; margin-bottom: 0; }
-
-/* ---------- Footer ---------- */
-footer {
-  text-align: center;
-  font-size: 0.85rem;
-  padding: 1.25rem 1rem 0;
+/* ---------- Roadmap ---------- */
+.roadmap h2 {
+  margin-top: 0.9rem;
+  color: var(--c, var(--lime));
+  font-size: 1rem;
 }
+
+.roadmap ul { list-style: none; }
+
+.roadmap li::before {
+  content: "- ";
+  color: var(--moss);
+}
+
+/* ---------- Music list ---------- */
+.tracks p {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  column-gap: 1rem;
+}
+
+.track .n {
+  margin-right: 0.8rem;
+  color: var(--amber);
+  font-weight: 700;
+}
+
+.tracks .by { font-size: 0.85rem; opacity: 0.8; }
+
+/* ---------- Stats ---------- */
+.stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem 4rem;
+}
+
+.stat-block { min-width: 18rem; }
+
+.stat-block .head {
+  color: var(--teal);
+  font-weight: 700;
+}
+
+.stat-block .sep {
+  border-top: 1px solid var(--moss);
+  margin: 0.3rem 0 0.5rem;
+  max-width: 18rem;
+}
+
+.stat-block .k { min-width: 12ch; }
+
+/* thin progress bar next to LeetCode difficulty rows */
+.bar {
+  display: inline-block;
+  width: 8rem;
+  height: 0.5rem;
+  margin-left: 1rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+}
+
+.bar i {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+}
+
+/* ---------- Bottom status bar ---------- */
+.status {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.6rem 1.5rem;
+  border-top: 1px solid rgba(99, 107, 47, 0.5);
+  font-size: 0.8rem;
+  line-height: 1.5;
+}
+
+/* shows the track that is playing, with pause / next / stop */
+.now {
+  display: flex;
+  align-items: baseline;
+  gap: 0.9rem;
+  min-width: 0;
+  color: var(--amber);
+}
+
+.now[hidden] { display: none; }
+
+.now .t {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.now .cmdlink { color: var(--sage); }
+.now .cmdlink:hover { color: var(--lime); }
 
 /* ---------- Turn off motion for people who prefer it ---------- */
 @media (prefers-reduced-motion: reduce) {
   * {
     animation: none !important;
     transition: none !important;
-    scroll-behavior: auto !important;
   }
 
   .type {
@@ -579,41 +741,21 @@ footer {
   }
 }
 
-/* ---------- Short screens: drop the optional bar items ---------- */
-@media (max-height: 760px) {
-  .bar .side { display: none; }
-}
-
-@media (max-height: 620px) {
-  .bar .quick { display: none; }
-}
-
-/* ---------- Small screens: the bar moves to the top ---------- */
+/* ---------- Small screens ---------- */
 @media (max-width: 700px) {
-  :root {
-    --pl: 12px;
-    --pt: 60px;
-    --gap: 0.6rem;
-  }
+  :root { --gap: 0.6rem; }
 
-  .bar {
-    bottom: auto;
-    right: 0;
-    width: auto;
-    height: var(--pt);
-    flex-direction: row;
-    padding: 0 12px;
-  }
-
-  .bar .mono { width: 38px; height: 38px; }
-  .bar nav { flex-direction: row; padding: 5px 8px; }
-  .bar nav a { width: 34px; height: 34px; }
-  .bar nav a::after,
-  .bar-bottom { display: none; }
+  .toolbar { padding: 0.6rem 1rem; }
+  .toolbar-hint { font-size: 0.8rem; }
+  .status { padding: 0.5rem 1rem; }
+  .keys { display: none; }
 
   .screen { padding: 1.25rem 1rem 1.5rem; }
   .fetch { grid-template-columns: 1fr; gap: 1.25rem; }
   .info { padding-left: 1rem; }
   .md h1 { font-size: 1.4rem; }
   .k { min-width: 9ch; }
+  .help .k { min-width: 0; width: 100%; }
+
+  .menu-item { grid-template-columns: 1fr; }
 }
