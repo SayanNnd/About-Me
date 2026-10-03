@@ -1,93 +1,142 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>SAYAN NANDI | About Me</title>
-  <link rel="stylesheet" href="style.css">
+  <meta name="theme-color" content="#14160c">
+  <title>Sayan Nandi | About Me</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
-  <header>
-    <div class="container">
-      <a class="logo" href="#about">About Me</a>
-      <nav>
-        <a href="#about">About</a>
-        <a href="#skills">Skills</a>
-        <a href="#projects">Projects</a>
-        <a href="#contact">Contact</a>
+
+  <!-- ===== SIDE BAR (stays on the left, like the Caelestia shell bar) ===== -->
+  <header class="bar">
+    <a class="mono" href="#top" aria-label="Home">SN</a>
+
+    <nav aria-label="Main">
+      <a href="#top"      data-label="home"     style="--c: var(--coral)"><b>1</b></a>
+      <a href="#about"    data-label="about"    style="--c: var(--amber)"><b>2</b></a>
+      <a href="#skills"   data-label="skills"   style="--c: var(--teal)"><b>3</b></a>
+      <a href="#projects" data-label="projects" style="--c: var(--sky)"><b>4</b></a>
+      <a href="#contact"  data-label="contact"  style="--c: var(--pink)"><b>5</b></a>
+    </nav>
+
+    <div class="bar-bottom">
+      <!-- Quick links: always visible, so people can reach you from any section -->
+      <nav class="quick" aria-label="Quick links">
+        <a href="https://github.com/SayanNnd" data-label="github" aria-label="GitHub" style="--c: var(--lavender)"><b>GH</b></a>
+        <a href="https://linkedin.com/in/sayan-nandi-1b05b9291" data-label="linkedin" aria-label="LinkedIn" style="--c: var(--sky)"><b>in</b></a>
+        <a href="mailto:sayannandi.ix.a@gmail.com" data-label="email" aria-label="Email" style="--c: var(--coral)"><b>@</b></a>
       </nav>
+
+      <a class="up" href="#top" data-label="back to top" aria-label="Back to top">&#8593;</a>
+
+      <span class="side">sayan@iiitg</span>
     </div>
   </header>
 
-  <main>
-    <section id="about">
-      <div class="container">
-        <h1>Hi, I'm Sayan Nandi.</h1>
-        <p>I'm a freshman-year EC-AI student at IIIT Guwahati.</p> 
-        <p>I'm most interested in low-level systems programming: how memory is managed, how programs run under the hood, and what makes software fast.</p>
-        <p>C++ is my main language, and I like building things from scratch to understand them properly.</p>
-        <p>I'm also learning DSA and Web Dev and planning to learn Rust, Go and CUDA programming in future.</p>
-        <a class="button" href="#projects">See my projects</a>
-      </div>
-    </section>
+  <main class="window" id="top">
+    <div class="screen">
 
-    <section id="skills">
-      <div class="container">
-        <h2>Skills</h2>
-        <ul class="skills">
+      <!-- ===== FASTFETCH ===== -->
+      <p class="prompt">
+        <span class="u">sayan@iiitg</span><span class="dir">~</span><span class="sym">&#10095;</span>
+        <span class="type cmd" style="--n:9; --d:.3s">fastfetch</span>
+      </p>
+
+      <div class="fetch">
+        <img class="logo-img" src="logo.png" alt="Profile logo">
+        <div class="info">
+          <p class="head">sayan@iiitg</p>
+          <div class="sep"></div>
+          <p><span class="k">Name</span>Sayan Nandi</p>
+          <p><span class="k">Uni</span>IIIT Guwahati</p>
+          <p><span class="k">Branch</span>EC-AI, freshman year</p>
+          <p><span class="k">Language</span>C/C++</p>
+          <p><span class="k">Focus</span>Low-level Systems Programming</p>
+          <p><span class="k">Learning</span>DSA, Web Dev</p>
+          <p><span class="k">Next</span>Rust, Go, CUDA</p>
+          <div class="swatches" aria-hidden="true">
+            <span class="s1"></span><span class="s2"></span><span class="s3"></span><span class="s4"></span>
+            <span class="s5"></span><span class="s6"></span><span class="s7"></span><span class="s8"></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== ABOUT ===== -->
+      <section class="block" id="about">
+        <p class="prompt"><span class="u">sayan@iiitg</span><span class="dir">~</span><span class="sym">&#10095;</span> <span class="cmd">cat about.md</span></p>
+        <div class="out md">
+          <h1><span class="hash"># </span>Hi, I'm Sayan Nandi.</h1>
+          <p>I'm a freshman-year EC-AI student at IIIT Guwahati.</p>
+          <p>I'm most interested in low-level systems programming: how memory is managed, how programs run under the hood, and what makes software fast.</p>
+          <p>C++ is my main language, and I like building things from scratch to understand them properly.</p>
+          <p>I'm also learning DSA and Web Dev and planning to learn Rust, Go and CUDA programming in future.</p>
+          <a class="button" href="#projects">See my projects</a>
+        </div>
+      </section>
+
+      <!-- ===== SKILLS ===== -->
+      <section class="block" id="skills">
+        <p class="prompt"><span class="u">sayan@iiitg</span><span class="dir">~</span><span class="sym">&#10095;</span> <span class="cmd">ls ~/skills</span></p>
+        <ul class="out ls">
           <li>C/C++</li>
           <li>Javascript</li>
         </ul>
-      </div>
-    </section>
+      </section>
 
-    <section id="projects">
-      <div class="container">
-        <h2>Projects</h2>
-        <div class="projects">
+      <!-- ===== PROJECTS ===== -->
+      <section class="block" id="projects">
+        <p class="prompt"><span class="u">sayan@iiitg</span><span class="dir">~</span><span class="sym">&#10095;</span> <span class="cmd">ls ~/projects</span></p>
+        <div class="out projects">
+
           <article class="project">
-            <h3>ATHEON - VCS</h3>
-            <p>WIP Custom Version Control System written entirely from scratch in C++17 with zero external dependencies.</p>
+            <h2>atheon/ <span class="badge">WIP</span></h2>
+            <p>ATHEON - VCS. WIP Custom Version Control System written entirely from scratch in C++17 with zero external dependencies.</p>
             <p class="tech">Tech Used : C++, Multi-Threading</p>
-            <a href="#SHA">View source(WIP)</a>
+            <!-- Add your repo link here when it's ready: <a class="src" href="https://github.com/SayanNnd/...">View source</a> -->
+            <span class="src off">View source (WIP)</span>
           </article>
 
           <article class="project">
-            <h3 id="SHA">SHA-256 Generator</h3>
+            <h2>sha-256-generator/</h2>
             <p>A zero-dependency C++ implementation of the SHA-256 cryptographic hash function written from scratch.</p>
             <p class="tech">Tech Used : C++, Multi-Threading</p>
-            <a href="https://github.com/SayanNnd/SHA-256-Generator">View source</a>
+            <a class="src" href="https://github.com/SayanNnd/SHA-256-Generator">View source</a>
           </article>
 
           <article class="project">
-            <h3>Terminal Wordle</h3>
-            <p>A lightweight, zero-dependency, daily Wordle game made in C that syncs between devices and saves game states.</p>
-            <p class="tech">Tech Used : C</p><br>
-            <a href="https://github.com/SayanNnd/Terminal-Wordle">View source</a>
+            <h2>terminal-wordle/</h2>
+            <p>A lightweight, zero-dependency, daily Wordle game made in C that syncs between devices.</p>
+            <p class="tech">Tech Used : C</p>
+            <a class="src" href="https://github.com/SayanNnd/Terminal-Wordle">View source</a>
           </article>
+
         </div>
-      </div>
-    </section>
+      </section>
 
-    <section id="contact">
-      <div class="container">
-        <h2>Contact</h2>
-        <ul>
-          <li>Email -> <a href="sayannandi.ix.a@gmail.com">sayannandi.ix.a@gmail.com</a></li>
-          <li>GitHub -> <a href="https://github.com/SayanNnd">github.com/SayanNnd</a></li>
-          <li>LinkedIn -> <a href="https://linkedin.com/in/sayan-nandi-1b05b9291">linkedin.com/in/sayan-nandi-1b05b9291</a></li>
-        </ul>
-      </div>
-    </section>
+      <!-- ===== CONTACT ===== -->
+      <section class="block" id="contact">
+        <p class="prompt"><span class="u">sayan@iiitg</span><span class="dir">~</span><span class="sym">&#10095;</span> <span class="cmd">cat contact.txt</span></p>
+        <div class="out contact">
+          <p><span class="k">Email</span><span class="arrow">-&gt;</span><a href="mailto:sayannandi.ix.a@gmail.com">sayannandi.ix.a@gmail.com</a></p>
+          <p><span class="k">GitHub</span><span class="arrow">-&gt;</span><a href="https://github.com/SayanNnd">github.com/SayanNnd</a></p>
+          <p><span class="k">LinkedIn</span><span class="arrow">-&gt;</span><a href="https://linkedin.com/in/sayan-nandi-1b05b9291">linkedin.com/in/sayan-nandi-1b05b9291</a></p>
+        </div>
+      </section>
 
+      <!-- Last prompt with blinking cursor -->
+      <p class="prompt end"><span class="u">sayan@iiitg</span><span class="dir">~</span><span class="sym">&#10095;</span> <span class="cursor" aria-hidden="true"></span></p>
+
+    </div>
   </main>
 
   <footer>
-    <p>&copy; 2026 Sayan Nandi</p>
+    <p>&copy; 2026 &middot; Sayan Nandi</p>
   </footer>
 
 </body>
