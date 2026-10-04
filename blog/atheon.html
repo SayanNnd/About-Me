@@ -180,7 +180,22 @@ if (i >= n) break;</code></pre>
           <p>It's written to <code>index.temp</code> and then renamed over <code>index</code>, so a crash in the middle can't leave a half-written index behind.</p>
           <p>A small detail I enjoyed: C++17 has no <code>clock_cast</code>, so converting a file's modification time to Unix seconds means subtracting <code>file_clock::now()</code> and adding <code>system_clock::now()</code>. It's a hack, but it works on both Windows and Linux.</p>
           <p><strong>A known problem I'm fixing in V2.</strong> The second phase, which turns hashes into blobs and index entries, also uses several threads, and they all write into one shared <code>std::map</code>. That's a data race. It works on small projects, but it's undefined behavior.</p>
-          
+
+          <h2 id="atheonignore">.atheonignore</h2>
+          <p>Once <code>conflux .</code> was working, I immediately ran into a practical problem: I didn't want build artifacts, editor temp files, or the <code>.atheon/</code> folder itself showing up as tracked files. So I added a <code>.atheonignore</code> file, which works exactly like <code>.gitignore</code> but is parsed by Atheon at the start of any file-walk.</p>
+          <p>The implementation is straightforward. When <code>conflux</code> is about to walk the project directory, it first reads <code>.atheonignore</code> line by line and builds a set of patterns to skip:</p>
+          <ul>
+            <li>Blank lines and lines starting with <code>#</code> are treated as comments and ignored.</li>
+            <li>Everything else is stored as a ignore rule.</li>
+          </ul>
+          <p>Then, during the directory walk, before pushing a discovered path onto the stack, Atheon checks whether the entry's name or its path relative to the project root matches anything in that set. <code>.atheon/</code> itself is always skipped unconditionally, so the object store can never accidentally commit itself.</p>
+          <pre><code># .atheonignore example
+build/
+*.o
+*.exe
+.vscode/</code></pre>
+          <p>It's a small feature but it made Atheon feel like an actual usable tool rather than a toy. This also took a durprisingly long time to build with all the edge cases.</p>
+
           <h2 id="anchor">anchor: committing (My brain fried itself while writing this code)</h2>
           <p>The index is a <em>flat</em> list of paths, but a commit needs <em>nested</em> trees, one for each directory. <code>anchor</code> bridges that in two steps.</p>
           <p><strong>Build the tree in memory.</strong> Each path like <code>src/main.cpp</code> is split on <code>/</code>, and the program walks down creating folder nodes (a <code>std::map</code> from name to child) until it reaches the file, which becomes a leaf holding its blob hash.</p>

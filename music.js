@@ -86,9 +86,14 @@
     }
 
     el.hidden = false;
-    el.replaceChildren();
 
     const paused = audio.paused;
+
+    // Preserve the slider's focus so dragging doesn't stutter
+    const hadSliderFocus = document.activeElement?.id === 'vol-slider';
+
+    el.replaceChildren();
+
     const titleSpan = document.createElement('span');
     titleSpan.className = 't';
     titleSpan.textContent = `${paused ? '\u275A\u275A' : '\u266A'} ${TRACKS[current].title}`;
@@ -114,7 +119,38 @@
     stopBtn.textContent = 'stop';
     stopBtn.addEventListener('click', () => stop());
 
-    el.append(titleSpan, playBtn, nextBtn, stopBtn);
+    // ── Volume slider ──────────────────────────────────────────────
+    const volWrap = document.createElement('span');
+    volWrap.className = 'vol-wrap';
+
+    const volIcon = document.createElement('span');
+    volIcon.className = 'vol-icon';
+    volIcon.setAttribute('aria-hidden', 'true');
+    volIcon.textContent = audio.volume === 0 ? '🔇' : audio.volume < 0.4 ? '🔈' : audio.volume < 0.75 ? '🔉' : '🔊';
+
+    const slider = document.createElement('input');
+    slider.type = 'range';
+    slider.id = 'vol-slider';
+    slider.className = 'vol-slider';
+    slider.min = '0';
+    slider.max = '100';
+    slider.step = '1';
+    slider.value = Math.round(audio.volume * 100);
+    slider.setAttribute('aria-label', 'Volume');
+    // Update the CSS custom property for the fill track
+    slider.style.setProperty('--vol', `${slider.value}%`);
+
+    slider.addEventListener('input', () => {
+      const v = Number(slider.value) / 100;
+      setVolume(v);
+      slider.style.setProperty('--vol', `${slider.value}%`);
+      volIcon.textContent = v === 0 ? '🔇' : v < 0.4 ? '🔈' : v < 0.75 ? '🔉' : '🔊';
+    });
+
+    volWrap.append(volIcon, slider);
+    el.append(titleSpan, playBtn, nextBtn, stopBtn, volWrap);
+
+    if (hadSliderFocus) slider.focus();
   }
 
   function playIndex(i, seekTime = 0, shouldPlay = true) {
@@ -238,6 +274,21 @@
     if (e.key === STORAGE_KEY && e.newValue) {
       try {
         const remote = JSON.parse(e.newValue);
+        // Sync volume silently (no re-save needed)
+        if (typeof remote.volume === 'number' && remote.volume !== audio.volume) {
+          audio.volume = Math.max(0, Math.min(1, remote.volume));
+          // Update slider if it's visible
+          const slider = document.getElementById('vol-slider');
+          if (slider) {
+            slider.value = Math.round(audio.volume * 100);
+            slider.style.setProperty('--vol', `${slider.value}%`);
+            const icon = slider.previousElementSibling;
+            if (icon) {
+              const v = audio.volume;
+              icon.textContent = v === 0 ? '🔇' : v < 0.4 ? '🔈' : v < 0.75 ? '🔉' : '🔊';
+            }
+          }
+        }
         if (remote.index !== current) {
           playIndex(remote.index, remote.time || 0, !remote.paused).catch(() => {});
         } else if (remote.paused !== audio.paused) {
