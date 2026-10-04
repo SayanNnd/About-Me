@@ -10,6 +10,7 @@
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
   <noscript><style>.dropdown, .input-line { display: none; }</style></noscript>
+  <script src="music.js" defer></script>
   <script src="script.js" defer></script>
 </head>
 
@@ -17,12 +18,18 @@
 
   <main class="window">
 
-    <!-- ===== TOP STRIP: hint + quick-command dropdown (filled in by script.js) ===== -->
+    <!-- ===== TOP STRIP: hint + navigation + quick-command dropdown (filled in by script.js) ===== -->
     <header class="toolbar">
       <p class="toolbar-hint">Type a command or pick one from the list.</p>
-      <div class="dropdown">
-        <button id="menu-btn" class="menu-btn" type="button" aria-haspopup="true" aria-expanded="false" aria-controls="menu">commands</button>
-        <div id="menu" class="menu" hidden></div>
+      <div class="toolbar-actions">
+        <nav class="toolbar-nav" aria-label="Site">
+          <a class="nav-pill" href="index.html" aria-current="page">Portfolio</a>
+          <a class="nav-pill" href="blog/index.html">Blog</a>
+        </nav>
+        <div class="dropdown">
+          <button id="menu-btn" class="menu-btn" type="button" aria-haspopup="true" aria-expanded="false" aria-controls="menu">commands</button>
+          <div id="menu" class="menu" hidden></div>
+        </div>
       </div>
     </header>
 
@@ -90,7 +97,10 @@
               <h2>atheon/ <span class="badge">WIP</span></h2>
               <p>ATHEON - VCS. WIP Custom Version Control System written entirely from scratch in C++17 with zero external dependencies.</p>
               <p class="tech">Tech Used : C++, Multi-Threading</p>
-              <span class="src off">View source (WIP)</span>
+              <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: auto;">
+                <a class="src" href="blog/atheon.html">Read blog post &rarr;</a>
+                <a class="src" href="https://github.com/SayanNnd/Atheon">View source</a>
+              </div>
             </article>
 
             <article class="project" data-skills="c-cpp" style="--accent: var(--teal)">
@@ -176,6 +186,25 @@
       <li data-src="music/Bershy - Radio (Lyrics) Dispatch Song - NewMelody.mp3" data-artist="Bershy">Radio</li>
       <li data-src="music/KOMM, SUSSER TOD M-10 Director's Edit Version  Evangelion Finally - Milan Records USA.mp3" data-artist="Milan Records USA">Evangelion Finally</li>
     </ol>
+  </template>
+
+  <template id="blog">
+    <div class="out md">
+      <h1><span class="hash"># </span>Blog</h1>
+      <p>Write-ups of the things I build and what I learn while building them.</p>
+      <div class="projects" style="margin-top: 1rem; grid-template-columns: minmax(260px, 100%);">
+        <article class="project" style="--accent: var(--coral)">
+          <h2>Building Atheon: a version control system from scratch in C++</h2>
+          <p>How my SHA-256 generator turned into a mini Git. A walk through of my experience and how the whole program fits together.</p>
+          <div class="tech">October 2026 &middot; ~11 min read &middot; C++, Systems, Version Control</div>
+          <div style="display: flex; gap: 0.6rem; flex-wrap: wrap; margin-top: 0.4rem;">
+            <a class="src" href="blog/atheon.html">Read post &rarr;</a>
+            <a class="src" href="blog/index.html">Visit ~/blog &rarr;</a>
+          </div>
+        </article>
+      </div>
+      <p class="hint" style="margin-top: 0.85rem;">Run <code>open blog</code> or visit <a href="blog/index.html">~/blog</a> for the full reading experience.</p>
+    </div>
   </template>
 
 </body>

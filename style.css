@@ -110,7 +110,7 @@ code { color: var(--amber); }
   pointer-events: none;
 }
 
-/* ---------- Top strip: hint + commands dropdown ---------- */
+/* ---------- Top strip: hint + navigation + commands dropdown ---------- */
 .toolbar {
   display: flex;
   align-items: center;
@@ -118,11 +118,43 @@ code { color: var(--amber); }
   gap: 1rem;
   padding: 0.8rem 1.5rem;
   border-bottom: 1px solid rgba(99, 107, 47, 0.5);
+  flex-wrap: wrap;
 }
 
 .toolbar-hint {
   font-size: 0.85rem;
   line-height: 1.4;
+}
+
+.toolbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex: none;
+}
+
+.toolbar-nav {
+  display: flex;
+  gap: 0.6rem;
+  flex: none;
+}
+
+.nav-pill {
+  display: inline-block;
+  padding: 0.15rem 1rem;
+  border: 1px solid var(--amber);
+  border-radius: 999px;
+  color: var(--amber);
+  font-size: 0.9rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.nav-pill:hover,
+.nav-pill[aria-current="page"] {
+  background: var(--amber);
+  color: var(--bg);
 }
 
 .dropdown { position: relative; flex: none; }

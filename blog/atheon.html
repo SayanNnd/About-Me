@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#14160c">
+  <meta name="description" content="Building Atheon: a version control system from scratch in C++. How my SHA-256 generator turned into a mini Git.">
+  <title>Building Atheon: a version control system from scratch in C++ | Sayan Nandi</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="blog.css">
+  <script src="../music.js" defer></script>
+  <script src="blog.js" defer></script>
+</head>
+
+<body>
+  <a class="skip-link" href="#content">Skip to content</a>
+
+  <main class="window">
+
+    <!-- ===== TOP STRIP ===== -->
+    <header class="toolbar">
+      <p class="toolbar-hint">Write-ups on my projects and experiences.</p>
+      <nav class="toolbar-nav" aria-label="Site">
+        <a class="nav-pill" href="../index.html">Portfolio</a>
+        <a class="nav-pill" href="index.html">Blog</a>
+      </nav>
+    </header>
+
+    <div class="screen" id="screen">
+
+      <p class="prompt">
+        <span class="u">sayan@iiitg</span><span class="dir">~/blog</span><span class="sym">&#10095;</span>
+        <span class="cmd">cat atheon.md</span>
+      </p>
+
+      <!-- ===== POST HEADER ===== -->
+      <header class="post-head">
+        <h1>Building Atheon: a version control system from scratch in C++</h1>
+        <p class="subtitle">How my SHA-256 generator turned into a mini Git. A walk through of my experience and how the whole program fits together.</p>
+        <div class="post-meta">
+          <time datetime="2026-10">October 2026</time>
+          <span>&middot;</span>
+          <span>~11 min read</span>
+        </div>
+        <ul class="tags">
+          <li>C++</li>
+          <li>Systems</li>
+          <li>Version Control</li>
+        </ul>
+      </header>
+
+      <!-- ===== POST LAYOUT: ARTICLE + TOC ===== -->
+      <div class="post-layout">
+
+        <article class="post" id="content" tabindex="-1">
+
+          <h2 id="why-i-built-this">Why I built this</h2>
+          <p>A while ago I wrote a SHA-256 generator in C++: give it a file, get back a 64-character fingerprint. Change one byte and the whole fingerprint changes. Same content, same fingerprint, every time.</p>
+          <p>Then it clicked that this single property is most of what Git is built on. If a fingerprint identifies content, you can store content <em>by</em> its fingerprint, compare two versions by comparing two short strings, and build entire histories out of those strings.</p>
+          <p>So I set myself some rules: <strong>C++17, standard library only</strong>. No external hashing or compression library. The point wasn't to replace Git, it was to understand it. The result is <strong>Atheon</strong>.</p>
+          <p style="font-size: 14px;"><em>(And yes thats a refrence to the Vault of Glass raid from Destiny 2)</em></p>
+
+          <h2 id="the-big-picture">The big picture</h2>
+          <p>Before any command makes sense, you need to know what Atheon stores. Everything lives in a hidden <code>.atheon/</code> folder:</p>
+          <pre><code>.atheon/
+├── HEAD            "ref: refs/heads/alpha"
+├── index           the staging area
+├── refs/heads/     one file per branch, containing a commit hash
+└── objects/        everything else, stored by hash (objects/ab/cdef...)</code></pre>
+          <p>There are only three kinds of objects, and all three are named by their SHA-256 hash:</p>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Object</th>
+                  <th>What it holds</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Blob</strong></td>
+                  <td>The contents of one file</td>
+                </tr>
+                <tr>
+                  <td><strong>Tree</strong></td>
+                  <td>A directory listing: names pointing to blobs or to other trees</td>
+                </tr>
+                <tr>
+                  <td><strong>Commit</strong></td>
+                  <td>A pointer to one root tree, a pointer to the parent commit, a timestamp, and a message</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p>Because commits point to their parents, history is a chain:</p>
+          <pre><code>C3 ──▶ C2 ──▶ C1</code></pre>
+          <p>One nice side effect of naming things by content: if two files are identical, they hash the same, so Atheon stores them once.(Saving storage)</p>
+
+          <!-- PLACEHOLDER 1: Directory Tree & Objects -->
+          <figure class="img-frame">
+            <img src="../img/folder.gif" alt=".atheon folder structure">
+            <figcaption>Fig 1. The hidden .atheon folder layout: HEAD, index, refs, and hashed objects.</figcaption>
+          </figure>
+
+          <h2 id="the-commands">The commands</h2>
+          <p>I gave every command its own name and its own module. Here's the mapping to Git:</p>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Atheon</th>
+                  <th>Git equivalent</th>
+                  <th>What it does</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>vault</code></td>
+                  <td><code>init</code></td>
+                  <td>Creates the repository</td>
+                </tr>
+                <tr>
+                  <td><code>conflux</code></td>
+                  <td><code>add</code></td>
+                  <td>Stages files</td>
+                </tr>
+                <tr>
+                  <td><code>anchor</code></td>
+                  <td><code>commit</code></td>
+                  <td>Records a snapshot</td>
+                </tr>
+                <tr>
+                  <td><code>timestream</code></td>
+                  <td><code>log</code></td>
+                  <td>Shows history</td>
+                </tr>
+                <tr>
+                  <td><code>oracle</code></td>
+                  <td><code>status</code></td>
+                  <td>Compares committed, staged, and working files</td>
+                </tr>
+                <tr>
+                  <td><code>timegate</code></td>
+                  <td><code>checkout</code></td>
+                  <td>Travels to an older commit or a branch</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="edit-note">[If it wasn't clear, I LOVE Destiny 2!]</p>
+
+          <h2 id="vault">vault: starting a repository</h2>
+          <p>The simplest command, and the one that sets the rules for everything else. It creates <code>.atheon/</code>, <code>objects/</code>, and <code>refs/heads/</code>, then writes the HEAD file:</p>
+          <pre><code>ref: refs/heads/alpha</code></pre>
+          <p>HEAD doesn't contain a commit hash. It points to a <em>branch name</em>, and the branch file points to the commit. That extra hop is what makes branches cheap: moving to a new commit means rewriting one tiny file.</p>
+          <p>On Windows, <code>vault</code> also marks the folder hidden with <code>SetFileAttributes</code>, behind an <code>#ifdef</code> so the code still compiles elsewhere.</p>
+
+          <h2 id="conflux">conflux: staging</h2>
+          <p><code>conflux</code> takes a file, or <code>.</code> for everything, and gets it ready to commit. This is where my SHA-256 generator came back in.</p>
+          <p><strong>Step 1: Guards.</strong> It checks the repo exists and that HEAD is attached to a branch (more on why in the <code>timegate</code> section).</p>
+          <p><strong>Step 2: Collect files.</strong> Walking the project folder uses an explicit stack of directories instead of recursion. Ignored paths, from a <code>.atheonignore</code> file plus <code>.atheon/</code> itself, are skipped.</p>
+          <p><strong>Step 3: Hash in parallel.</strong> This is the part I'm proudest of. Atheon spawns a number of worker threads (half the machine's hardware threads), and they share one atomic counter:</p>
+          <pre><code>const size_t i = global_index.fetch_add(1);
+if (i >= n) break;</code></pre>
+          <p>Each thread grabs the next unclaimed file index, hashes it, and stores the result in a slot that belongs only to that index. There are no locks, and no pre-split work. A thread that lands a huge file doesn't hold up the others, because the rest simply keep claiming the next number.</p>
+          <p>Each file is read in <strong>128 KB chunks</strong> and fed to <code>SHA256::update()</code>, so memory use stays flat whether the file is 1 KB or 1 GB. This is why my generator's streaming design (<code>update</code> many times, <code>final</code> once) mattered. These were the core concepts I learnt from my previous SHA-256 project that I implemented here.</p>
+
+          <!-- PLACEHOLDER 2: Multithreaded Hashing in action -->
+          <figure class="img-frame">
+            <img src="../img/conflux.gif" alt="Ateon Conflux Execution">
+            <figcaption>Fig 2. Staging files in parallel with lock-free atomic claiming and streaming SHA-256.</figcaption>
+          </figure>
+
+          <p><strong>Step 4: Write blobs.</strong> A blob is the header <code>blob &lt;size&gt;\0</code> followed by the raw bytes, stored at <code>objects/ab/cdef...</code> (first two hex characters as the folder name, to keep folders small). If the blob already exists and the file is unchanged, it's skipped.</p>
+          <p><strong>Step 5: Write the index.</strong> One line per file:</p>
+          <pre><code>&lt;hash&gt; &lt;size&gt; &lt;mtime&gt; &lt;path&gt;</code></pre>
+          <p>It's written to <code>index.temp</code> and then renamed over <code>index</code>, so a crash in the middle can't leave a half-written index behind.</p>
+          <p>A small detail I enjoyed: C++17 has no <code>clock_cast</code>, so converting a file's modification time to Unix seconds means subtracting <code>file_clock::now()</code> and adding <code>system_clock::now()</code>. It's a hack, but it works on both Windows and Linux.</p>
+          <p><strong>A known problem I'm fixing in V2.</strong> The second phase, which turns hashes into blobs and index entries, also uses several threads, and they all write into one shared <code>std::map</code>. That's a data race. It works on small projects, but it's undefined behavior.</p>
+          
+          <h2 id="anchor">anchor: committing (My brain fried itself while writing this code)</h2>
+          <p>The index is a <em>flat</em> list of paths, but a commit needs <em>nested</em> trees, one for each directory. <code>anchor</code> bridges that in two steps.</p>
+          <p><strong>Build the tree in memory.</strong> Each path like <code>src/main.cpp</code> is split on <code>/</code>, and the program walks down creating folder nodes (a <code>std::map</code> from name to child) until it reaches the file, which becomes a leaf holding its blob hash.</p>
+          <p><strong>Write trees bottom-up.</strong> Writing the whole logic for a tree was a very tough experience and something I feel like taught me a lot about these data structures. Here a function recurses through the tree: a leaf just returns its blob hash, while a folder builds a listing of its children, one per line:</p>
+          <pre><code>100644 main.cpp\0&lt;blob hash&gt;
+040000 src\0&lt;tree hash&gt;</code></pre>
+          <p>then hashes that listing and stores it as a tree object. Children <em>must</em> be hashed before their parent, because the parent's content includes the children's hashes. So a change to one file changes its blob hash, which changes its folder's hash, which changes every folder above it up to the root.</p>
+          <p>That has a very useful consequence: <strong>the root tree hash represents the entire project</strong>. So &ldquo;nothing to commit&rdquo; is just one string comparison between the new root hash and the last one.</p>
+          <p>If something did change, the commit object is written:</p>
+          <pre><code>tree 9f2c...e1
+parent 4ab7...03
+timestamp 1759650000
+message add staging</code></pre>
+          <p>It's hashed like everything else, and then the branch file is updated to point at it.</p>
+          <p><strong>The bug that broke history.</strong> At one point, after refactoring how the parent hash is read, every commit silently lost its parent. Commits worked, and <code>status</code> looked fine, but <code>timestream</code> only ever showed one commit. The cause was reading into a string I'd just cleared, so the read buffer had size zero and read nothing. Nothing crashed, and the output was just quietly wrong.</p>
+
+          <h2 id="timestream">timestream: the log</h2>
+          <p>The simplest command to explain: it's a linked list traversal.</p>
+          <ol>
+            <li>Read HEAD. If it's <code>ref: ...</code>, open that branch file to get the newest commit hash.</li>
+            <li>Open the commit object, read its <code>parent</code>, <code>timestamp</code>, and <code>message</code> lines.</li>
+            <li>Follow the parent hash. Repeat until a commit has no parent.</li>
+          </ol>
+          <p>Then print the list newest-first with the time formatted. It also works when HEAD holds a raw hash, which is what happens after checking out an old commit.</p>
+          
+          <h2 id="oracle">oracle: the status command</h2>
+          <p>Out of all the commands, <code>oracle</code> took the most thinking, because it compares <strong>three</strong> states of the project:</p>
+          <ul>
+            <li><strong>Committed</strong>: what the last commit says</li>
+            <li><strong>Staged</strong>: what the index says</li>
+            <li><strong>Working directory</strong>: what's actually on disk right now</li>
+          </ul>
+          <p>Comparing committed against staged gives &ldquo;changes to be committed&rdquo;. Comparing staged against disk gives &ldquo;changes not staged&rdquo;. Each comparison sorts files into new, modified, and deleted.</p>
+          <p>Loading the committed state means walking the tree objects with a stack and building a <code>path &rarr; hash</code> map for the last commit. Loading the working directory means walking the folders.</p>
+          <p>The speed trick: re-hashing every file on every status would be slow. So Atheon first compares each file's <strong>size and modification time</strong> with what the index recorded, and only re-hashes files where those differ. If the hash still matches after all, the file counts as unchanged.</p>
+          <p>I also wrote <code>mini_oracle()</code>, a version that just answers &ldquo;is the project completely clean?&rdquo; with yes or no. Checkout uses it. Honestly, it duplicates most of <code>oracle</code>'s logic, and merging the two is on my V2 cleanup list.</p>
+
+          <!-- PLACEHOLDER 3: Oracle 3-State Status output -->
+          <figure class="img-frame">
+            <img src="../img/oracle.gif" alt="Atheon oracle status comparison">
+            <figcaption>Fig 3. Oracle comparing committed, staged, and working directory states.</figcaption>
+          </figure>
+        
+          <h2 id="timegate">timegate: checkout</h2>
+          <p><code>timegate</code> rewrites your working folder to match any earlier commit, or a branch.</p>
+          <ol>
+            <li><strong>Check for a clean project</strong> using <code>mini_oracle()</code>. If there are uncommitted changes, it asks before overwriting anything.</li>
+            <li><strong>Load the target commit's files</strong> into a <code>path &rarr; blob hash</code> map by walking its trees.</li>
+            <li><strong>Delete files that Atheon was tracking but the target commit doesn't have.</strong> It decides this from the index, so files Atheon never tracked are left alone. I only delete what I know I'm responsible for.</li>
+            <li><strong>Restore each file.</strong> For every file in the target commit, it creates parent folders, opens the blob, skips the <code>blob &lt;size&gt;\0</code> header by reading up to the null byte, and streams the rest into the working file in 128 KB chunks.</li>
+            <li><strong>Rewrite the index</strong> to match, so <code>oracle</code> reports a clean state afterwards.</li>
+            <li><strong>Update HEAD.</strong></li>
+          </ol>
+          <p>That last step is the interesting one and the one that took the msot time to understand and write for me. If you check out a <strong>branch name</strong>, HEAD becomes <code>ref: refs/heads/&lt;name&gt;</code>, so you're attached to a branch. If you check out a <strong>commit hash</strong>, HEAD holds the raw hash: a <strong>detached HEAD</strong>.</p>
+          <p>While detached, Atheon refuses to stage or commit. If it allowed commits there, they'd belong to no branch, and the moment you moved away they'd be unreachable. I'd heard &ldquo;detached HEAD&rdquo; in Git as a scary phrase; building it myself, I finally understood why (I genuienly hate it). Refactoring the whole codebase to support the detached HEAD was also another chore but nonetheless it was done.</p>
+          <p class="edit-note">[I have to mention though watching all the old files restore was VERY SATISFYING to watch]</p>
+
+          <h2 id="two-ways-to-use-it">Two ways to use it</h2>
+          <p><code>main.cpp</code> supports both a command-line interface and an interactive menu:</p>
+          <pre><code>atheon conflux .
+atheon anchor -m "first commit"
+atheon oracle</code></pre>
+          <p>If you pass arguments, it dispatches on the first one. If you pass nothing, it shows a numbered menu. Because each command is its own function, both interfaces call the exact same code, and only checkout needed a shared helper, since the menu and CLI both had to resolve a hash or branch name.</p>
+
+          <!-- PLACEHOLDER 4: Menu vs CLI Mode -->
+          <figure class="img-frame">
+            <img src="../img/cli_interface.gif" alt="CLI_MODE vs INTERFACE_MODE">
+            <figcaption>Fig 4. Dual interface: interactive numbered menu alongside standard CLI commands.</figcaption>
+          </figure>
+
+          <h2 id="what-id-do-differently">Next Goals for Version 2 of Atheon</h2>
+          <ul>
+            <li><strong>Fix the shared-map race</strong> in <code>conflux</code> (above).</li>
+            <li><strong>Merge <code>oracle</code> and <code>mini_oracle</code></strong> so the comparison logic lives in one place.</li>
+            <li><strong>Hash the blob header too.</strong> Right now a blob's name is the hash of the file contents only, while the stored object also has a header. Git hashes header plus content, which lets you verify an object later by re-hashing exactly what's on disk. I'd like an integrity-check command, and that design makes it easier.</li>
+            <li>Add <strong>compression</strong>, <strong>branch creation</strong>, <strong>unstaging</strong>, <strong>commit authors</strong>, <strong>diffs</strong>, and eventually <strong>merge</strong> (YES I HATE MYSELF THAT MUCH)</li>
+          </ul>
+
+          <h2 id="what-i-learned">What I learned</h2>
+          <p>As much as I would love to talk about all the technical things I learned while making Atheon, the most valuable lesson was actually a <strong>shift in my mindset</strong>. Before taking on this challenge, I used to look at large-scale software projects as monumental, almost impossible feats. The sheer scale and complexity of building a version control system—even a mini version of something as intricate as Git—felt completely out of my depth. However, once I actually took the plunge, it all slowly started making sense. By breaking down every single command into its smallest, most manageable logic components, the impossible suddenly became achievable. Building Atheon taught me that no system is too complex to build; it is simply a collection of small, solvable problems stacked together.</p>
+          <p>So I guess if there is anything I take away from this project is the fact that nothing is too complex to build with enough <strong>patience.</strong> All you gotta do is just <strong><em>LET IT HAPPEN</em></strong>.</p>
+
+          <h2 id="try-it">Try it</h2>
+          <ul>
+            <li>Atheon: <a href="https://github.com/SayanNnd/Atheon" target="_blank" rel="noopener">github.com/SayanNnd/Atheon</a></li>
+            <li>The SHA-256 generator it started from: <a href="https://github.com/SayanNnd/SHA-256-Generator" target="_blank" rel="noopener">github.com/SayanNnd/SHA-256-Generator</a></li>
+          </ul>
+          <p>If you read the code and spot something I got wrong, I'd genuinely like to hear about it.</p>
+          <p><strong><em>And yes, always remember "Guardians Make Their Own Fate"</em></strong></p>
+
+          <!-- Navigation buttons at bottom of post -->
+          <nav class="post-nav">
+            <a class="button" href="index.html">&larr; Back to all posts</a>
+            <button class="button" type="button" id="to-top" style="background: var(--forest); color: var(--sage); border: 1px solid var(--moss);">&uarr; Back to top</button>
+          </nav>
+
+          
+          <img src="../img/banana.gif" alt="BANANA" style="border-radius: 10px; width: 50%; margin-top: 20px; margin-bottom: 1rem;">
+  
+
+        </article>
+
+        <!-- ===== "ON THIS PAGE" TOC (filled in by blog.js) ===== -->
+        <aside class="toc" aria-label="Table of contents">
+          <p class="head">On this page</p>
+          <ol id="toc-list"></ol>
+        </aside>
+
+      </div>
+
+    </div>
+
+    <!-- ===== FOOTER: READING PROGRESS & MUSIC ===== -->
+    <footer class="status">
+      <span>&copy; 2026 &middot; Sayan Nandi</span>
+      <div class="progress" aria-label="Reading progress">
+        <span class="bar"><i id="progress-fill"></i></span>
+        <span id="progress-label">0%</span>
+      </div>
+      <span class="now" id="now" hidden></span>
+    </footer>
+
+  </main>
+
+</body>
+</html>

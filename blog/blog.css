@@ -1,0 +1,515 @@
+/* =========================================================================
+   blog.css
+   Loaded AFTER ../style.css. It reuses everything from there (colors, the
+   screen frame, the gradient window, prompt chips, links, buttons, .project
+   cards, .bar) and only adds what the blog needs.
+   ========================================================================= */
+
+/* ---------- Small helpers ---------- */
+
+/* smooth scrolling for "On this page" links, unless the visitor prefers less motion */
+@media (prefers-reduced-motion: no-preference) {
+  .screen { scroll-behavior: smooth; }
+}
+
+/* keyboard users can jump straight to the content */
+.skip-link {
+  position: fixed;
+  top: 0.5rem;
+  left: 0.5rem;
+  z-index: 20;
+  padding: 0.3rem 1rem;
+  border-radius: 999px;
+  background: var(--amber);
+  color: var(--bg);
+  font-weight: 700;
+  text-decoration: none;
+  transform: translateY(-300%);
+}
+
+.skip-link:focus { transform: translateY(0); }
+
+#content:focus { outline: none; }
+
+/* ---------- Top strip ---------- */
+.toolbar { flex-wrap: wrap; }
+
+.toolbar-nav {
+  display: flex;
+  gap: 0.6rem;
+  flex: none;
+}
+
+/* same pill as the "commands" button on the portfolio, without the chevron */
+.nav-pill {
+  display: inline-block;
+  padding: 0.15rem 1rem;
+  border: 1px solid var(--amber);
+  border-radius: 999px;
+  color: var(--amber);
+  font-size: 0.9rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.nav-pill:hover,
+.nav-pill[aria-current="page"] {
+  background: var(--amber);
+  color: var(--bg);
+}
+
+/* ---------- Tags and post meta (shared by the list and the post) ---------- */
+.tags {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.tags li {
+  --c: var(--lime);
+  padding: 0 0.8rem;
+  border: 1px solid var(--c);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.04);
+  background: color-mix(in srgb, var(--c) 16%, transparent);
+  color: var(--c);
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.tags li:nth-child(1) { --c: var(--coral); }
+.tags li:nth-child(2) { --c: var(--teal); }
+.tags li:nth-child(3) { --c: var(--lavender); }
+.tags li:nth-child(4) { --c: var(--amber); }
+
+.post-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1.5rem;
+  font-size: 0.85rem;
+  opacity: 0.85;
+}
+
+/* ---------- Blog home: list of posts ---------- */
+.posts {
+  display: grid;
+  gap: 1rem;
+  max-width: 46rem;
+}
+
+/* the whole card is a link, so cancel the lime fill that plain links get on hover */
+.post-card {
+  color: var(--sage);
+  text-decoration: none;
+}
+
+.post-card:hover { color: var(--sage); }
+
+.post-card h2 { line-height: 1.4; }
+
+/* ---------- Post page: header ---------- */
+.post-head {
+  max-width: 1550px;
+  margin-bottom: 2.5rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid rgba(99, 107, 47, 0.4);
+}
+
+.post-head h1 {
+  font-size: 2.2rem;
+  line-height: 1.3;
+  color: var(--lime);
+  margin-bottom: 0.6rem;
+  letter-spacing: -0.01em;
+}
+
+.post-head .subtitle {
+  margin-bottom: 1.1rem;
+  font-style: normal;
+  font-size: 1.08rem;
+  line-height: 1.65;
+  color: var(--sage);
+  max-width: 105ch;
+  opacity: 0.95;
+}
+
+.post-head .post-meta { margin-bottom: 0.8rem; }
+
+/* ---------- Post page: article + "On this page" ---------- */
+.post-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 25rem;
+  gap: 3.5rem;
+  align-items: start;
+  max-width: 1550px;
+  padding-bottom: 4rem;
+}
+
+.post {
+  min-width: 0;
+  max-width: 100%;
+  font-size: 1.05rem;
+  line-height: 1.85;
+}
+
+.post p,
+.post ul,
+.post ol {
+  margin-bottom: 1.35rem;
+  max-width: 105ch;
+}
+
+.post ul,
+.post ol { padding-left: 1.4rem; }
+
+.post li { margin-bottom: 0.4rem; }
+.post li::marker { color: var(--moss); }
+
+.post strong { color: var(--lime); }
+
+/* Section headings. Every h2 is a direct child of .post, so the colors rotate. */
+.post h2 {
+  --c: var(--lime);
+  margin: 2.75rem 0 0.9rem;
+  color: var(--c);
+  font-size: 1.25rem;
+  line-height: 1.4;
+  scroll-margin-top: 1rem;
+}
+
+.post h2::before {
+  content: "## ";
+  color: var(--moss);
+}
+
+.post h2:first-child { margin-top: 0; }
+
+.post h2:nth-of-type(6n+1) { --c: var(--coral); }
+.post h2:nth-of-type(6n+2) { --c: var(--amber); }
+.post h2:nth-of-type(6n+3) { --c: var(--teal); }
+.post h2:nth-of-type(6n+4) { --c: var(--sky); }
+.post h2:nth-of-type(6n+5) { --c: var(--lavender); }
+.post h2:nth-of-type(6n+6) { --c: var(--pink); }
+
+/* inline code */
+.post code {
+  padding: 0 0.35rem;
+  border-radius: 6px;
+  background: rgba(20, 22, 12, 0.55);
+  font-size: 0.9em;
+}
+
+/* code blocks */
+.post pre {
+  margin-bottom: 1.5rem;
+  padding: 1.25rem 1.5rem;
+  overflow-x: auto;
+  border: 1px solid rgba(99, 107, 47, 0.55);
+  border-radius: 16px;
+  background: rgba(20, 22, 12, 0.75);
+  font-size: 0.9rem;
+  line-height: 1.65;
+  tab-size: 4;
+  max-width: 105ch;
+  scrollbar-width: thin;
+  scrollbar-color: var(--moss) transparent;
+}
+
+.post pre code {
+  padding: 0;
+  background: none;
+  color: var(--sage);
+  font-size: inherit;
+}
+
+/* tables scroll sideways inside their own box on small screens */
+.table-wrap {
+  margin-bottom: 1.5rem;
+  overflow-x: auto;
+  border: 1px solid rgba(99, 107, 47, 0.55);
+  border-radius: 16px;
+  max-width: 105ch;
+  background: rgba(34, 37, 22, 0.45);
+}
+
+/* Hyprland-styled image frames & placeholders */
+.img-frame {
+  margin: 2.25rem 0;
+  max-width: 105ch;
+  border: 1px solid rgba(99, 107, 47, 0.6);
+  border-radius: 18px;
+  background: rgba(20, 22, 12, 0.7);
+  overflow: hidden;
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.35);
+  transition: border-color 0.25s ease, transform 0.25s ease;
+}
+
+.img-frame:hover {
+  border-color: var(--teal);
+  transform: translateY(-2px);
+}
+
+.img-frame img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 16px 16px 0 0;
+}
+
+.img-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  padding: 3rem 2rem;
+  background: repeating-linear-gradient(
+    -45deg,
+    rgba(61, 65, 39, 0.25),
+    rgba(61, 65, 39, 0.25) 12px,
+    rgba(34, 37, 22, 0.4) 12px,
+    rgba(34, 37, 22, 0.4) 24px
+  );
+  border-bottom: 1px dashed rgba(99, 107, 47, 0.45);
+  color: var(--sage);
+  text-align: center;
+}
+
+.img-placeholder .img-icon {
+  font-size: 2rem;
+  color: var(--teal);
+}
+
+.img-placeholder .img-hint {
+  font-size: 0.95rem;
+  color: var(--amber);
+  font-weight: 700;
+}
+
+.img-placeholder .img-sub {
+  font-size: 0.82rem;
+  color: var(--sage);
+  opacity: 0.8;
+}
+
+.img-frame figcaption {
+  padding: 0.75rem 1.25rem;
+  background: rgba(34, 37, 22, 0.65);
+  color: var(--sage);
+  font-size: 0.85rem;
+  font-style: italic;
+  border-top: 1px solid rgba(99, 107, 47, 0.3);
+}
+
+/* Bonus / fun placeholder card at the end of the post */
+.bonus-box {
+  margin-top: 3.5rem;
+  max-width: 105ch;
+  padding: 1.75rem 2rem;
+  border-radius: 20px;
+  background: rgba(61, 65, 39, 0.35);
+  border: 1px dashed var(--amber);
+  position: relative;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+  transition: all 0.25s ease;
+}
+
+.bonus-box:hover {
+  border-color: var(--lime);
+  background: rgba(61, 65, 39, 0.5);
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.35);
+}
+
+.bonus-header {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-bottom: 0.9rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid rgba(99, 107, 47, 0.4);
+}
+
+.bonus-tag {
+  display: inline-block;
+  padding: 0.2rem 0.85rem;
+  border-radius: 999px;
+  background: var(--amber);
+  color: var(--bg);
+  font-weight: 700;
+  font-size: 0.8rem;
+  letter-spacing: 0.05em;
+}
+
+.bonus-hint {
+  font-size: 0.85rem;
+  color: var(--sage);
+  opacity: 0.85;
+}
+
+.bonus-body p {
+  margin-bottom: 0.75rem;
+  line-height: 1.7;
+}
+
+.bonus-body p:last-child {
+  margin-bottom: 0;
+}
+
+.post table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.post th,
+.post td {
+  padding: 0.55rem 0.9rem;
+  text-align: left;
+  vertical-align: top;
+}
+
+.post th {
+  color: var(--amber);
+  border-bottom: 1px solid rgba(99, 107, 47, 0.55);
+}
+
+.post tr + tr td { border-top: 1px solid rgba(99, 107, 47, 0.25); }
+
+/* Reminder boxes for the author. Delete these paragraphs (or hide the class) before publishing. */
+.edit-note {
+  margin-bottom: 1rem;
+  padding: 0.6rem 0.9rem;
+  border: 1px dashed var(--coral);
+  border-radius: 12px;
+  color: var(--coral);
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+
+/* "On this page" Table of Contents */
+.toc {
+  position: sticky;
+  top: 1rem;
+  max-height: calc(100dvh - 9rem);
+  overflow-y: auto;
+  font-size: 0.92rem;
+  line-height: 1.6;
+  padding: 1.6rem 1.4rem 1.8rem;
+  border: 1px solid rgba(99, 107, 47, 0.5);
+  border-radius: 20px;
+  background: rgba(61, 65, 39, 0.45);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 14px 35px rgba(0, 0, 0, 0.28);
+  scrollbar-width: thin;
+  scrollbar-color: var(--moss) transparent;
+}
+
+.toc .head {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 1rem;
+  padding-bottom: 0.6rem;
+  border-bottom: 1px solid rgba(99, 107, 47, 0.35);
+  color: var(--teal);
+  font-size: 0.88rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.toc .head::before {
+  content: "";
+  display: inline-block;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: var(--teal);
+  box-shadow: 0 0 10px var(--teal);
+}
+
+.toc ol {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  border-left: 2px solid rgba(99, 107, 47, 0.45);
+}
+
+.toc a {
+  display: block;
+  margin-left: -2px;
+  padding: 0.45rem 1rem;
+  border-left: 2px solid transparent;
+  border-radius: 0 10px 10px 0;
+  color: var(--sage);
+  text-decoration: none;
+  font-size: 0.9rem;
+  line-height: 1.45;
+  transition: all 0.2s ease;
+}
+
+.toc a:hover {
+  background: rgba(212, 222, 149, 0.14);
+  color: var(--lime);
+  padding-left: 1.15rem;
+}
+
+.toc a[aria-current="true"] {
+  border-left-color: var(--amber);
+  background: rgba(230, 180, 80, 0.16);
+  color: var(--amber);
+  font-weight: 700;
+}
+
+.post-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 3rem;
+}
+
+.post-nav .button { margin-top: 0; }
+
+/* ---------- Footer: reading progress ---------- */
+.progress {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  color: var(--amber);
+}
+
+.progress .bar i {
+  width: 0;
+  background: var(--amber);
+}
+
+.progress #progress-label {
+  min-width: 4ch;
+  margin-left: 0.6rem;
+}
+
+/* ---------- Narrower screens ---------- */
+@media (max-width: 1100px) {
+  .post-layout {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2rem;
+  }
+  .toc {
+    position: static;
+    max-height: none;
+    margin-bottom: 2rem;
+  }
+}
+
+@media (max-width: 700px) {
+  .post-head h1 { font-size: 1.6rem; }
+  .post pre { padding: 0.9rem 1rem; }
+  .progress .bar { width: 4.5rem; }
+}

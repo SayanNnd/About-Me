@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#14160c">
+  <meta name="description" content="Write-ups on systems programming, C++, and building things from scratch, by Sayan Nandi.">
+  <title>Blog | Sayan Nandi</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="blog.css">
+  <script src="../music.js" defer></script>
+  <script src="blog.js" defer></script>
+</head>
+
+<body>
+  <a class="skip-link" href="#content">Skip to content</a>
+
+  <main class="window">
+
+    <!-- ===== TOP STRIP ===== -->
+    <header class="toolbar">
+      <p class="toolbar-hint">Write-ups on my projects and experiences.</p>
+      <nav class="toolbar-nav" aria-label="Site">
+        <a class="nav-pill" href="../index.html">Portfolio</a>
+        <a class="nav-pill" href="index.html" aria-current="page">Blog</a>
+      </nav>
+    </header>
+
+    <div class="screen" id="screen">
+
+      <!-- ===== INTRO ===== -->
+      <section class="block" id="content" tabindex="-1">
+        <p class="prompt"><span class="u">sayan@iiitg</span><span class="dir">~/blog</span><span class="sym">&#10095;</span> <span class="cmd">cat README.md</span></p>
+        <div class="out md">
+          <h1><span class="hash"># </span>Blog</h1>
+          <p>Write-ups of the things I build and what I learn while building them.</p>
+        </div>
+      </section>
+
+      <!-- ===== POSTS ===== -->
+      <section class="block" id="posts">
+        <p class="prompt"><span class="u">sayan@iiitg</span><span class="dir">~/blog</span><span class="sym">&#10095;</span> <span class="cmd">ls posts/</span></p>
+
+        <div class="out posts">
+
+          <!--
+            To add a new post: copy this whole <a> card, change the link, title,
+            summary, date, read time and tags, and put the newest post first.
+            Change --accent to any color variable from style.css.
+          -->
+          <a class="project post-card" href="atheon.html" style="--accent: var(--coral)">
+            <h2>Building Atheon: a version control system from scratch in C++</h2>
+            <p>How my SHA-256 generator turned into a mini Git. A walk through every command, how the whole program fits together, and the bugs I hit along the way.</p>
+            <div class="post-meta">
+              <time datetime="2026-10">October 2026</time>
+              <span>11 min read</span>
+            </div>
+            <ul class="tags">
+              <li>C++</li>
+              <li>Systems</li>
+              <li>Version Control</li>
+            </ul>
+          </a>
+
+        </div>
+
+        <p class="hint">New posts will appear here.</p>
+      </section>
+
+    </div>
+
+    <footer class="status">
+      <span>&copy; 2026 &middot; Sayan Nandi</span>
+      <span class="now" id="now" hidden></span>
+    </footer>
+
+  </main>
+
+</body>
+</html>

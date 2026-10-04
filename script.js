@@ -55,6 +55,7 @@
     projects: grab('projects'),
     contact: grab('contact'),
     roadmap: grabTemplate('roadmap'),
+    blog: grabTemplate('blog'),
   };
 
   // A re-run fastfetch should appear instantly instead of replaying the fade-in
@@ -80,12 +81,13 @@
   const links = Object.fromEntries(
     $$('#contact .contact p').map((p) => [$('.k', p).textContent.trim().toLowerCase(), $('a', p).href])
   );
+  links.blog = 'blog/index.html';
 
   const lastSegment = (href) => new URL(href).pathname.split('/').filter(Boolean).pop() || '';
   const githubUser = links.github ? lastSegment(links.github) : '';
   const leetcodeUser = links.leetcode ? lastSegment(links.leetcode) : '';
 
-  const tracks = $$('li', $('#music') ? $('#music').content : document.createDocumentFragment()).map((li) => {
+  const tracks = (window.MusicPlayer && window.MusicPlayer.tracks) || $$('li', $('#music') ? $('#music').content : document.createDocumentFragment()).map((li) => {
     const src = li.dataset.src || '';
     return {
       src,
@@ -102,6 +104,7 @@
     { cmd: 'cat roadmap.md',  desc: 'Where I am headed' },
     { cmd: 'ls skills',       desc: 'My skills, click one for its projects' },
     { cmd: 'ls projects',     desc: "What I've built" },
+    { cmd: 'blog',            desc: 'Technical write-ups and blog posts' },
     { cmd: 'stats',           desc: 'Live GitHub and LeetCode stats' },
     { cmd: 'ls music',        desc: 'Tracks you can play' },
     { cmd: 'cat contact.txt', desc: 'Email, GitHub, LinkedIn, LeetCode' },
@@ -185,6 +188,7 @@
       ['roadmap.md', 'cat roadmap.md', 'file'],
       ['skills/', 'ls skills', 'dir'],
       ['projects/', 'ls projects', 'dir'],
+      ['blog/', 'blog', 'dir'],
       ['music/', 'ls music', 'dir'],
       ['contact.txt', 'cat contact.txt', 'file'],
     ].forEach(([label, cmd, kind]) => wrap.append(cmdButton(label, cmd, `cmdlink ${kind}`)));
@@ -211,94 +215,43 @@
     return [note(`${count} project${count === 1 ? '' : 's'} using ${skill.label}`), cards];
   }
 
-  /* ---------- music player ---------- */
-  const audio = new Audio();
-  audio.preload = 'none';
-  audio.volume = 0.6;
-  let current = -1;   // index of the loaded track, -1 = nothing loaded
-
-  function renderNow() {
-    nowEl.replaceChildren();
-    if (current < 0) {
-      nowEl.hidden = true;
-      return;
-    }
-    nowEl.hidden = false;
-    const paused = audio.paused;
-    nowEl.append(
-      make('span', 't', `${paused ? '\u275A\u275A' : '\u266A'} ${tracks[current].title}`),
-      cmdButton(paused ? 'play' : 'pause', paused ? 'play' : 'pause', 'cmdlink', true),
-      cmdButton('next', 'next', 'cmdlink', true),
-      cmdButton('stop', 'stop', 'cmdlink', true)
-    );
-  }
-
-  function startTrack(i) {
-    current = i;
-    audio.src = tracks[i].src;
-    renderNow();
-    return Promise.resolve(audio.play());
-  }
-
-  function stopPlayback() {
-    audio.pause();
-    audio.removeAttribute('src');
-    audio.load();
-    current = -1;
-    renderNow();
-  }
-
-  // Start a track and return the line to print. If the file can't be loaded, the line turns into an error.
+  /* ---------- music player (uses window.MusicPlayer) ---------- */
   function playIndex(i) {
-    const t = tracks[i];
+    const p = window.MusicPlayer;
+    if (!p) return noTracks();
+    const t = p.tracks[i];
+    if (!t) return [err('Invalid track.')];
     const line = text(`\u266A Now playing: ${t.title}${t.artist ? ` (${t.artist})` : ''}`);
-    startTrack(i).catch((e) => {
+    p.playIndex(i).catch((e) => {
       if (e && e.name === 'AbortError') return;
       line.className = 'err';
       line.textContent = `Couldn't play ${t.src}. Check that the file is in the music folder.`;
-      stopPlayback();
     });
     return [line];
   }
 
   function findTrack(query) {
-    const q = query.trim().toLowerCase();
-    if (/^\d+$/.test(q)) return Number(q) - 1 < tracks.length ? Number(q) - 1 : -1;
-    const exact = tracks.findIndex((t) => t.slug === q || t.title.toLowerCase() === q);
-    return exact >= 0 ? exact : tracks.findIndex((t) => t.slug.includes(q) || t.title.toLowerCase().includes(q));
+    const p = window.MusicPlayer;
+    return p ? p.findTrack(query) : -1;
   }
 
-  const noTracks = () => [err('No tracks yet. Add files to the music folder and list them in index.html.')];
+  const noTracks = () => [err('No tracks yet. Add files to the music folder.')];
 
   function musicView() {
-    if (!tracks.length) return noTracks();
+    const p = window.MusicPlayer;
+    const list = p ? p.tracks : tracks;
+    if (!list.length) return noTracks();
     const wrap = make('div', 'out tracks');
-    tracks.forEach((t, i) => {
-      const p = make('p');
-      const playingNow = i === current && !audio.paused;
+    list.forEach((t, i) => {
+      const row = make('p');
       const btn = cmdButton('', `play ${i + 1}`, 'cmdlink track');
       btn.append(make('span', 'n', '\u25B6\uFE0E'), `${i + 1}  ${t.title}`);
-      p.append(btn);
-      if (t.artist) p.append(make('span', 'by', t.artist));
-      wrap.append(p);
+      row.append(btn);
+      if (t.artist) row.append(make('span', 'by', t.artist));
+      wrap.append(row);
     });
     wrap.append(hint('Click a track or run play <name>. Control it with pause, next, prev, stop and volume.'));
     return [wrap];
-  }
-
-  audio.addEventListener('play', renderNow);
-  audio.addEventListener('pause', renderNow);
-  audio.addEventListener('ended', () => {
-    if (tracks.length) startTrack((current + 1) % tracks.length).catch(stopPlayback);
-  });
-  if (tracks.length) {
-    const randomTrack = Math.floor(Math.random() * tracks.length);
-    startTrack(randomTrack).catch((error) => {
-      if (error.name !== 'NotAllowedError') {
-        console.error('Could not start music:', error);
-        stopPlayback();
-      }
-    });
   }
 
   /* ---------- stats (GitHub + LeetCode) ---------- */
@@ -444,6 +397,7 @@
 
     about: () => [views.about()],
     roadmap: () => [views.roadmap()],
+    blog: () => [views.blog()],
     contact: () => [views.contact()],
     skills: ([query]) => (query ? skillProjects(query) : [views.skills()]),
     projects: (args) => (args.length ? skillProjects(args.join(' ')) : [views.projects()]),
@@ -455,9 +409,10 @@
       if (name === 'about.md') return [views.about()];
       if (name === 'roadmap.md') return [views.roadmap()];
       if (name === 'contact.txt') return [views.contact()];
+      if (name === 'blog' || name === 'blog/atheon.md' || name === 'atheon.md') return [views.blog()];
       const bare = name.replace(/\/$/, '');
-      if (['skills', 'projects', 'music'].includes(bare)) {
-        return [err(`cat: ${file}: Is a directory`), hint(`Try ls ${bare}`)];
+      if (['skills', 'projects', 'blog', 'music'].includes(bare)) {
+        return [err(`cat: ${file}: Is a directory`), hint(`Try ls ${bare} or run blog`)];
       }
       return [err(`cat: ${file}: No such file or directory`)];
     },
@@ -468,12 +423,20 @@
       if (!dir) return [dirListing()];
       if (dir === 'skills') return rest ? skillProjects(rest) : [views.skills()];
       if (dir === 'projects') return rest ? skillProjects(rest) : [views.projects()];
+      if (dir === 'blog') return [views.blog()];
       if (dir === 'music') return musicView();
       if (files.includes(dir)) return [text(dir)];
       return [err(`ls: cannot access '${target}': No such file or directory`)];
     },
 
-    cd: () => [text('This is a one-page site, so there is nothing to cd into. Try ls to see what is here.')],
+    cd: ([target = '']) => {
+      const clean = target.replace(/^(~\/|\.\/)/, '').replace(/\/$/, '').toLowerCase();
+      if (clean === 'blog') {
+        location.href = 'blog/index.html';
+        return [text('Entering ~/blog...')];
+      }
+      return [text('This is a terminal portfolio. Try ls, blog, or cd blog to see what is here.')];
+    },
 
     stats: ([which = '']) => {
       const key = which.toLowerCase();
@@ -485,46 +448,62 @@
     },
 
     play: (args) => {
-      if (!tracks.length) return noTracks();
+      const p = window.MusicPlayer;
+      if (!p || !p.tracks.length) return noTracks();
       const query = args.join(' ');
       if (!query) {
-        if (current < 0) return playIndex(0);
-        if (!audio.paused) return [text(`\u266A Already playing: ${tracks[current].title}`)];
-        Promise.resolve(audio.play()).catch(() => {});
-        return [text(`\u266A Resumed: ${tracks[current].title}`)];
+        if (p.getIndex() < 0) return playIndex(0);
+        if (p.isPlaying()) return [text(`\u266A Already playing: ${p.getCurrentTrack().title}`)];
+        p.resume().catch(() => {});
+        return [text(`\u266A Resumed: ${p.getCurrentTrack().title}`)];
       }
-      const i = findTrack(query);
+      const i = p.findTrack(query);
       if (i < 0) return [err(`No track matching "${query}".`), hint('Run ls music to see the list.')];
       return playIndex(i);
     },
 
     pause: () => {
-      if (current < 0 || audio.paused) return [text('Nothing is playing.')];
-      audio.pause();
+      const p = window.MusicPlayer;
+      if (!p || p.getIndex() < 0 || !p.isPlaying()) return [text('Nothing is playing.')];
+      p.pause();
       return [text('Paused. Run play to resume.')];
     },
 
     stop: () => {
-      if (current < 0) return [text('Nothing is playing.')];
-      stopPlayback();
+      const p = window.MusicPlayer;
+      if (!p || p.getIndex() < 0) return [text('Nothing is playing.')];
+      p.stop();
       return [text('Stopped.')];
     },
 
-    next: () => (tracks.length ? playIndex((current + 1) % tracks.length) : noTracks()),
-    prev: () => (tracks.length ? playIndex((current <= 0 ? tracks.length : current) - 1) : noTracks()),
+    next: () => {
+      const p = window.MusicPlayer;
+      if (!p || !p.tracks.length) return noTracks();
+      p.next();
+      return [text('\u266A Next track.')];
+    },
+
+    prev: () => {
+      const p = window.MusicPlayer;
+      if (!p || !p.tracks.length) return noTracks();
+      p.prev();
+      return [text('\u266A Previous track.')];
+    },
 
     volume: ([v]) => {
-      if (v === undefined) return [text(`Volume ${Math.round(audio.volume * 100)}%`)];
+      const p = window.MusicPlayer;
+      if (!p) return [];
+      if (v === undefined) return [text(`Volume ${p.getVolume()}%`)];
       const n = Number(v);
       if (!Number.isFinite(n) || n < 0 || n > 100) return [err('Usage: volume <0-100>')];
-      audio.volume = n / 100;
+      p.setVolume(n / 100);
       return [text(`Volume ${n}%`)];
     },
 
     open: ([name = '']) => {
       const key = name.toLowerCase();
       if (!Object.hasOwn(links, key)) return [err(`Usage: open <${Object.keys(links).join('|')}>`)];
-      if (key === 'email') location.href = links[key];
+      if (key === 'email' || key === 'blog') location.href = links[key];
       else window.open(links[key], '_blank', 'noopener');
       return [text(`Opening ${key}...`)];
     },
@@ -562,8 +541,8 @@
 
   /* ---------- Tab completion ---------- */
   const argChoices = {
-    ls: ['about.md', 'roadmap.md', 'skills/', 'projects/', 'music/', 'contact.txt', ...skillList.map((s) => `skills/${s.slug}`)],
-    cat: ['about.md', 'roadmap.md', 'contact.txt'],
+    ls: ['about.md', 'roadmap.md', 'skills/', 'projects/', 'blog/', 'music/', 'contact.txt', ...skillList.map((s) => `skills/${s.slug}`)],
+    cat: ['about.md', 'roadmap.md', 'contact.txt', 'blog/atheon.md'],
     open: Object.keys(links),
     stats: ['github', 'leetcode'],
     play: tracks.map((t) => t.slug),
