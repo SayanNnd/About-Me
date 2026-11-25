@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#14160c">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="site-root" content="..">
+  <title>Admin Studio | Sayan Nandi</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/src/styles/main.css">
+  <link rel="stylesheet" href="/src/styles/blog.css">
+  <link rel="stylesheet" href="/src/styles/admin.css">
+  <script type="module" src="/src/pages/admin.ts"></script>
+</head>
+
+<body>
+  <main class="window">
+
+    <header class="toolbar">
+      <p class="toolbar-hint">Owner Studio &middot; Private CMS &amp; Blog Editor</p>
+      <nav class="toolbar-nav" aria-label="Site">
+        <a id="nav-portfolio" class="nav-pill" href="../index.html">Portfolio</a>
+        <a id="nav-blog" class="nav-pill" href="../blog/index.html">Blogs</a>
+      </nav>
+    </header>
+
+    <div class="screen admin-screen" id="screen">
+      <div id="admin-status" class="admin-status" role="status" aria-live="polite" hidden></div>
+
+      <!-- ===== AUTH GATE (shown until owner signs in) ===== -->
+      <section id="auth-gate" class="auth-card" aria-labelledby="auth-heading">
+        <h1 id="auth-heading">Owner Authentication Required</h1>
+        <p>Sign in with a GitHub Personal Access Token (fine-grained, scoped to <code>Contents: Read &amp; Write</code> on this repository). Your token never leaves your browser except to talk directly to GitHub.</p>
+
+        <form id="auth-form" class="auth-form">
+          <div class="auth-row-2">
+            <div class="field">
+              <label for="gh-owner">GitHub Owner</label>
+              <input id="gh-owner" name="owner" type="text" required autocomplete="username" autocorrect="off" autocapitalize="none" spellcheck="false">
+            </div>
+            <div class="field">
+              <label for="gh-repo">Repository</label>
+              <input id="gh-repo" name="repo" type="text" required autocorrect="off" autocapitalize="none" spellcheck="false">
+            </div>
+            <div class="field">
+              <label for="gh-branch">Branch</label>
+              <input id="gh-branch" name="branch" type="text" required autocorrect="off" autocapitalize="none" spellcheck="false">
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="gh-token">GitHub Personal Access Token</label>
+            <span id="gh-token-hint" class="field-hint">Verified against repository owner &amp; push permissions before unlocking.</span>
+            <div class="token-wrap">
+              <input id="gh-token" name="token" type="password" required autocomplete="current-password" aria-describedby="gh-token-hint">
+              <button id="toggle-token" class="btn-chip" type="button" aria-pressed="false" aria-label="Show token">Show</button>
+            </div>
+          </div>
+
+          <label class="check-row" for="remember-token">
+            <input id="remember-token" type="checkbox">
+            Remember token in local browser storage
+          </label>
+
+          <div class="auth-actions">
+            <button id="auth-submit" class="btn-chip primary" type="submit">Unlock Studio</button>
+          </div>
+        </form>
+
+        <div id="local-dev-box" class="local-dev-box" hidden>
+          <div>
+            <strong>Local Vite Dev Server Detected</strong>
+            <p class="field-hint">Save changes directly to <code>src/content/</code> on disk with instant live reload.</p>
+          </div>
+          <button id="enter-local-dev" class="btn-chip" type="button">Enter Local Dev Mode</button>
+        </div>
+      </section>
+
+      <!-- ===== UNLOCKED WORKSPACE ===== -->
+      <section id="workspace" hidden>
+        <div class="admin-bar">
+          <div class="admin-tabs" role="tablist" aria-label="Admin sections">
+            <button id="tab-blogs" class="tab-btn" type="button" role="tab" aria-selected="true" aria-controls="panel-blogs">Blog Studio</button>
+            <button id="tab-site" class="tab-btn" type="button" role="tab" aria-selected="false" aria-controls="panel-site">Site Text &amp; Content</button>
+          </div>
+
+          <div class="admin-session-bar">
+            <span id="session-badge" class="session-pill"></span>
+            <button id="reload-remote" class="btn-chip" type="button">Reload Content</button>
+            <button id="sign-out" class="btn-chip danger" type="button">Lock / Sign Out</button>
+          </div>
+        </div>
+
+        <!-- ===== PANEL 1: BLOG STUDIO ===== -->
+        <div id="panel-blogs" role="tabpanel" aria-labelledby="tab-blogs">
+          <div class="studio-layout">
+            <aside class="studio-sidebar" aria-label="Blog posts">
+              <div class="studio-sidebar-head">
+                <h2>Posts</h2>
+                <button id="new-post-btn" class="btn-chip primary" type="button">+ New Post</button>
+              </div>
+              <ul id="admin-post-list" class="post-list"></ul>
+            </aside>
+
+            <div class="studio-main">
+              <form id="post-form" class="meta-panel" aria-labelledby="post-form-heading">
+                <h2 id="post-form-heading" style="position:absolute;clip-path:inset(50%);width:1px;height:1px;overflow:hidden;">Post metadata</h2>
+                <div class="meta-grid">
+                  <div class="field">
+                    <label for="post-title-input">Title</label>
+                    <input id="post-title-input" name="title" type="text" required>
+                  </div>
+                  <div class="field">
+                    <label for="post-slug-input">URL Slug</label>
+                    <input id="post-slug-input" name="slug" type="text" required pattern="[a-z0-9]+(?:-[a-z0-9]+)*" autocorrect="off" autocapitalize="none" spellcheck="false">
+                  </div>
+                  <div class="field">
+                    <label for="post-date-input">Display Date</label>
+                    <input id="post-date-input" name="date" type="text" required>
+                  </div>
+                  <div class="field">
+                    <label for="post-iso-input">ISO Month/Date</label>
+                    <input id="post-iso-input" name="dateIso" type="text" autocorrect="off" autocapitalize="none" spellcheck="false">
+                  </div>
+                </div>
+
+                <div class="field">
+                  <label for="post-subtitle-input">Subtitle / Summary</label>
+                  <input id="post-subtitle-input" name="subtitle" type="text" required>
+                </div>
+
+                <div class="meta-grid">
+                  <div class="field">
+                    <label for="post-tags-input">Tags (comma-separated)</label>
+                    <input id="post-tags-input" name="tags" type="text">
+                  </div>
+                  <div class="field">
+                    <label for="post-read-input">Read Time</label>
+                    <div class="token-wrap">
+                      <input id="post-read-input" name="readTime" type="text" required>
+                      <button id="auto-read-btn" class="btn-chip" type="button">Auto</button>
+                    </div>
+                  </div>
+                  <div class="field">
+                    <label for="post-accent-input">Accent Color</label>
+                    <select id="post-accent-input" name="accent">
+                      <option value="coral">coral</option>
+                      <option value="amber">amber</option>
+                      <option value="teal">teal</option>
+                      <option value="sky">sky</option>
+                      <option value="lavender">lavender</option>
+                      <option value="pink">pink</option>
+                      <option value="lime">lime</option>
+                    </select>
+                  </div>
+                  <div class="field">
+                    <label for="post-repo-input">Connected GitHub Repo (optional)</label>
+                    <input id="post-repo-input" name="projectRepo" type="text" list="github-repos-datalist" placeholder="e.g. Atheon" autocorrect="off" autocapitalize="none" spellcheck="false">
+                    <datalist id="github-repos-datalist"></datalist>
+                  </div>
+                </div>
+
+                <div class="meta-flags">
+                  <div class="meta-checks">
+                    <label class="check-row" for="post-published-input">
+                      <input id="post-published-input" type="checkbox">
+                      Published
+                    </label>
+                    <label class="check-row" for="post-featured-input">
+                      <input id="post-featured-input" type="checkbox">
+                      Featured in terminal <code>blog</code>
+                    </label>
+                  </div>
+
+                  <div class="meta-actions">
+                    <button id="delete-post-btn" class="btn-chip danger" type="button">Delete Post</button>
+                    <button id="save-post-btn" class="btn-chip primary" type="submit">Save &amp; Publish Post</button>
+                  </div>
+                </div>
+              </form>
+
+              <div class="editor-shell">
+                <div class="editor-toolbar">
+                  <div class="fmt-group" aria-label="Formatting tools">
+                    <button class="fmt-btn" type="button" data-fmt="h2">H2</button>
+                    <button class="fmt-btn" type="button" data-fmt="h3">H3</button>
+                    <button class="fmt-btn" type="button" data-fmt="bold">Bold</button>
+                    <button class="fmt-btn" type="button" data-fmt="italic">Italic</button>
+                    <button class="fmt-btn" type="button" data-fmt="code">Code</button>
+                    <button class="fmt-btn" type="button" data-fmt="codeblock">Code Block</button>
+                    <button class="fmt-btn" type="button" data-fmt="link">Link</button>
+                    <button class="fmt-btn" type="button" data-fmt="list">List</button>
+                    <button class="fmt-btn" type="button" data-fmt="table">Table</button>
+                    <button class="fmt-btn" type="button" data-fmt="figure">Figure</button>
+                    <button class="fmt-btn" type="button" data-fmt="note">Note</button>
+                  </div>
+
+                  <div class="view-group" aria-label="Editor layout">
+                    <button class="fmt-btn" type="button" data-mode="split" aria-pressed="true">Split</button>
+                    <button class="fmt-btn" type="button" data-mode="write" aria-pressed="false">Write</button>
+                    <button class="fmt-btn" type="button" data-mode="preview" aria-pressed="false">Preview</button>
+                  </div>
+                </div>
+
+                <div id="split-panes" class="split-panes" data-mode="split">
+                  <div class="write-pane">
+                    <label for="post-markdown-input" style="position:absolute;clip-path:inset(50%);width:1px;height:1px;overflow:hidden;">Blog post Markdown editor</label>
+                    <textarea id="post-markdown-input" spellcheck="true"></textarea>
+                    <div class="write-footer">
+                      <span id="editor-stats">0 words</span>
+                      <span>Supports Markdown + &lt;figure class="img-frame"&gt; + &lt;p class="edit-note"&gt;</span>
+                    </div>
+                  </div>
+
+                  <div class="preview-pane" aria-label="Live blog output preview">
+                    <header class="post-head">
+                      <h1 id="preview-title"></h1>
+                      <p id="preview-subtitle" class="subtitle"></p>
+                      <div class="post-meta">
+                        <time id="preview-date"></time>
+                        <span aria-hidden="true">&middot;</span>
+                        <span id="preview-read"></span>
+                      </div>
+                      <ul id="preview-tags" class="tags"></ul>
+                    </header>
+
+                    <details class="preview-toc-preview" open>
+                      <summary>On this page (auto-generated TOC)</summary>
+                      <ol id="preview-toc"></ol>
+                    </details>
+
+                    <article class="post" id="preview-body"></article>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== PANEL 2: SITE TEXT & CONTENT ===== -->
+        <div id="panel-site" role="tabpanel" aria-labelledby="tab-site" hidden>
+          <div class="site-editor">
+            <nav class="site-nav" aria-label="Site content sections">
+              <button class="site-nav-btn" type="button" data-site-sec="meta" aria-current="true">Meta &amp; Terminal</button>
+              <button class="site-nav-btn" type="button" data-site-sec="fastfetch">Fastfetch Card</button>
+              <button class="site-nav-btn" type="button" data-site-sec="about">About (about.md)</button>
+              <button class="site-nav-btn" type="button" data-site-sec="skills">Skills</button>
+              <button class="site-nav-btn" type="button" data-site-sec="projects">Projects</button>
+              <button class="site-nav-btn" type="button" data-site-sec="contact">Contact Links</button>
+              <button class="site-nav-btn" type="button" data-site-sec="roadmap">Roadmap</button>
+              <button class="site-nav-btn" type="button" data-site-sec="blogsstats">Blogs &amp; Stats</button>
+            </nav>
+
+            <form id="site-form" class="site-panel" aria-labelledby="site-panel-title">
+              <div class="site-panel-head">
+                <h2 id="site-panel-title">Meta &amp; Terminal</h2>
+                <button id="save-site-btn" class="btn-chip primary" type="submit">Publish Site Changes</button>
+              </div>
+              <div id="site-fields-root" class="repeat-list"></div>
+            </form>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <footer class="status">
+      <span id="footer-copy">&copy; 2026 &middot; Sayan Nandi</span>
+    </footer>
+
+  </main>
+
+  <dialog id="confirm-delete-dialog" class="confirm-dialog" aria-labelledby="confirm-delete-title">
+    <h1 id="confirm-delete-title">Delete this blog post?</h1>
+    <p id="confirm-delete-msg">This removes the post from posts.json and deletes its Markdown file.</p>
+    <form method="dialog" class="dialog-actions">
+      <button class="btn-chip" value="cancel" autofocus>Cancel</button>
+      <button class="btn-chip danger" value="delete">Delete</button>
+    </form>
+  </dialog>
+
+</body>
+</html>

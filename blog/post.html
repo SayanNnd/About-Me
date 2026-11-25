@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#14160c">
+  <meta name="site-root" content="..">
+  <meta name="description" content="Technical blog post by Sayan Nandi.">
+  <title>Post | Sayan Nandi</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/src/styles/main.css">
+  <link rel="stylesheet" href="/src/styles/blog.css">
+  <script type="module" src="/src/pages/blog-post.ts"></script>
+</head>
+
+<body>
+  <a class="skip-link" href="#content">Skip to content</a>
+
+  <main class="window">
+
+    <header class="toolbar">
+      <p class="toolbar-hint">Write-ups on my projects and experiences.</p>
+      <nav class="toolbar-nav" aria-label="Site">
+        <a id="nav-portfolio" class="nav-pill" href="../index.html">Portfolio</a>
+        <a id="nav-blog" class="nav-pill" href="index.html">Blogs</a>
+      </nav>
+    </header>
+
+    <div class="screen" id="screen">
+
+      <p class="prompt">
+        <span id="prompt-user" class="u">sayan@iiitg</span><span id="prompt-dir" class="dir">~/blog</span><span class="sym">&#10095;</span>
+        <span id="prompt-file" class="cmd">cat post.md</span>
+      </p>
+
+      <header class="post-head">
+        <h1 id="post-title">Loading...</h1>
+        <p id="post-subtitle" class="subtitle"></p>
+        <div class="post-meta">
+          <time id="post-date"></time>
+          <span aria-hidden="true">&middot;</span>
+          <span id="post-read-time"></span>
+        </div>
+        <ul id="post-tags" class="tags"></ul>
+      </header>
+
+      <div class="post-layout">
+
+        <article class="post" id="content" tabindex="-1">
+          <div id="post-body"></div>
+
+          <nav class="post-nav" aria-label="Post navigation">
+            <a id="back-to-posts" class="button" href="index.html">&larr; Back to all posts</a>
+            <button class="button back-top-btn" type="button" id="to-top">&uarr; Back to top</button>
+          </nav>
+        </article>
+
+        <aside class="toc" aria-label="Table of contents">
+          <p class="head">On this page</p>
+          <ol id="toc-list"></ol>
+        </aside>
+
+      </div>
+
+    </div>
+
+    <footer class="status">
+      <span id="footer-copy">&copy; 2026 &middot; Sayan Nandi</span>
+      <div class="progress" aria-label="Reading progress">
+        <span class="bar"><i id="progress-fill"></i></span>
+        <span id="progress-label">0%</span>
+      </div>
+      <span class="progress-spacer"></span>
+    </footer>
+
+  </main>
+
+</body>
+</html>

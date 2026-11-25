@@ -1,0 +1,28 @@
+{
+  "name": "about-me",
+  "version": "2.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && tsc -p tsconfig.node.json --noEmit && vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit && tsc -p tsconfig.node.json --noEmit"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SayanNnd/About-Me.git"
+  },
+  "author": "Sayan Nandi",
+  "license": "ISC",
+  "dependencies": {
+    "dompurify": "^3.2.6",
+    "marked": "^15.0.12"
+  },
+  "devDependencies": {
+    "@types/dompurify": "^3.2.0",
+    "@types/node": "^26.6.10",
+    "typescript": "^5.8.3",
+    "vite": "^6.3.5"
+  }
+}

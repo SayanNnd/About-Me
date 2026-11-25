@@ -1,0 +1,37 @@
+[
+  {
+    "slug": "harness",
+    "title": "Does your harness matter? Claude CLI vs Opencode",
+    "subtitle": "I ran the exact same two prompts through Claude CLI and my friend ran them through Opencode, both on Opus 5.5. A look at what actually changed between the two, and what didn't.",
+    "date": "November 2026",
+    "dateIso": "2026-11",
+    "readTime": "~8 min read",
+    "tags": [
+      "AI Tooling",
+      "Claude",
+      "Opencode",
+      "Experiments"
+    ],
+    "accent": "teal",
+    "published": true,
+    "featuredOnHome": true,
+    "projectRepo": "harness-experiment"
+  },
+  {
+    "slug": "atheon",
+    "title": "Building Atheon: a version control system from scratch in C++",
+    "subtitle": "How my SHA-256 generator turned into a mini Git. A walk through of my experience and how the whole program fits together.",
+    "date": "October 2026",
+    "dateIso": "2026-10",
+    "readTime": "~11 min read",
+    "tags": [
+      "C++",
+      "Systems",
+      "Version Control"
+    ],
+    "accent": "coral",
+    "published": true,
+    "featuredOnHome": true,
+    "projectRepo": "Atheon"
+  }
+]

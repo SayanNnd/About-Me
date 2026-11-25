@@ -1,0 +1,234 @@
+{
+  "meta": {
+    "siteTitle": "Sayan Nandi | About Me",
+    "blogPageTitle": "Blogs | Sayan Nandi",
+    "blogDescription": "Write-ups on systems programming, C++, and building things from scratch, by Sayan Nandi.",
+    "themeColor": "#14160c",
+    "ownerHandle": "SayanNnd",
+    "repoOwner": "SayanNnd",
+    "repoName": "About-Me",
+    "branch": "main"
+  },
+  "terminal": {
+    "user": "sayan@iiitg",
+    "homeDir": "~",
+    "blogDir": "~/blogs",
+    "toolbarHint": "Type a command or pick one from the list.",
+    "blogToolbarHint": "Write-ups on my projects and experiences.",
+    "navPortfolioLabel": "Portfolio",
+    "navBlogLabel": "Blogs",
+    "whoamiName": "Sayan",
+    "whoamiHint": "Sayan Nandi, EC-AI at IIIT Guwahati. Try fastfetch or cat about.md.",
+    "pwd": "/home/sayan",
+    "footerCopyright": "© 2026 · Sayan Nandi",
+    "footerKeysHint": "Tab complete · Ctrl+L clear"
+  },
+  "fastfetch": {
+    "logoSrc": "img/logo.gif",
+    "logoAlt": "Profile logo",
+    "head": "sayan@iiitg",
+    "rows": [
+      {
+        "key": "Name",
+        "value": "Sayan Nandi"
+      },
+      {
+        "key": "Uni",
+        "value": "IIIT Guwahati"
+      },
+      {
+        "key": "Branch",
+        "value": "EC-AI, freshman year"
+      },
+      {
+        "key": "Language",
+        "value": "C/C++"
+      },
+      {
+        "key": "Focus",
+        "value": "Low-level Systems Programming"
+      }
+    ]
+  },
+  "about": {
+    "heading": "Hi, I'm Sayan Nandi.",
+    "paragraphs": [
+      "I'm a freshman-year EC-AI student at IIIT Guwahati.",
+      "I'm most interested in low-level systems programming: how memory is managed, how programs run under the hood, and what makes software fast.",
+      "C++ is my main language, and I like building things from scratch to understand them properly.",
+      "I'm also learning DSA and building quality applications with agents and planning to learn Rust, CUDA programming and Networking in future."
+    ],
+    "ctaLabel": "See my projects",
+    "ctaCmd": "ls projects"
+  },
+  "skills": {
+    "hintPrefix": "Click a skill to search GitHub projects with that language, or run",
+    "hintCommand": "ls skills/<name>",
+    "items": [
+      {
+        "slug": "c-cpp",
+        "label": "C/C++",
+        "aliases": [
+          "c",
+          "c++",
+          "cpp",
+          "c/c++"
+        ]
+      },
+      {
+        "slug": "typescript",
+        "label": "Typescript",
+        "aliases": [
+          "ts",
+          "typescript",
+          "javascript",
+          "js",
+          "html",
+          "css"
+        ]
+      },
+      {
+        "slug": "rust",
+        "label": "Rust",
+        "aliases": [
+          "rs",
+          "rust"
+        ]
+      },
+      {
+        "slug": "git",
+        "label": "Version Control (Git)",
+        "aliases": [
+          "git",
+          "github",
+          "version control",
+          "vc"
+        ]
+      }
+    ]
+  },
+  "projects": {
+    "heading": "Projects",
+    "intro": "Things I've built till now :- ",
+    "defaultLimit": 3,
+    "githubUsername": "SayanNnd",
+    "overrides": [
+      {
+        "repo": "Atheon",
+        "title": "",
+        "badge": "",
+        "description": "",
+        "tech": "",
+        "accent": "coral",
+        "blogSlug": "atheon"
+      }
+    ],
+    "fallbackItems": [
+      {
+        "id": "atheon",
+        "title": "atheon/",
+        "badge": "WIP",
+        "description": "ATHEON - VCS. WIP Custom Version Control System written entirely from scratch in C++17 with zero external dependencies.",
+        "tech": "Language: C++",
+        "skills": [
+          "c-cpp"
+        ],
+        "accent": "coral",
+        "sourceUrl": "https://github.com/SayanNnd/Atheon",
+        "blogSlug": "atheon"
+      },
+      {
+        "id": "sha-256-generator",
+        "title": "sha-256-generator/",
+        "badge": "",
+        "description": "A zero-dependency C++ implementation of the SHA-256 cryptographic hash function written from scratch.",
+        "tech": "Language: C++",
+        "skills": [
+          "c-cpp"
+        ],
+        "accent": "teal",
+        "sourceUrl": "https://github.com/SayanNnd/SHA-256-Generator",
+        "blogSlug": ""
+      },
+      {
+        "id": "terminal-wordle",
+        "title": "terminal-wordle/",
+        "badge": "",
+        "description": "A lightweight, zero-dependency, daily Wordle game made in C that syncs between devices.",
+        "tech": "Language: C",
+        "skills": [
+          "c-cpp"
+        ],
+        "accent": "lavender",
+        "sourceUrl": "https://github.com/SayanNnd/Terminal-Wordle",
+        "blogSlug": ""
+      }
+    ]
+  },
+  "contact": {
+    "items": [
+      {
+        "key": "Email",
+        "label": "sayannandi.ix.a@gmail.com",
+        "href": "mailto:sayannandi.ix.a@gmail.com"
+      },
+      {
+        "key": "GitHub",
+        "label": "github.com/SayanNnd",
+        "href": "https://github.com/SayanNnd"
+      },
+      {
+        "key": "LinkedIn",
+        "label": "linkedin.com/in/sayan-nandi-1b05b9291",
+        "href": "https://linkedin.com/in/sayan-nandi-1b05b9291"
+      },
+      {
+        "key": "LeetCode",
+        "label": "leetcode.com/u/sayan_nnd",
+        "href": "https://leetcode.com/u/sayan_nnd/"
+      }
+    ]
+  },
+  "roadmap": {
+    "heading": "Roadmap",
+    "sections": [
+      {
+        "title": "Now",
+        "color": "coral",
+        "items": [
+          "C/C++ and systems",
+          "DSA",
+          "TypeScript",
+          "Agentic Development"
+        ]
+      },
+      {
+        "title": "Next",
+        "color": "amber",
+        "items": [
+          "Linux systems programming and POSIX",
+          "Rust",
+          "CUDA programming",
+          "Open source contributions"
+        ]
+      },
+      {
+        "title": "Later",
+        "color": "teal",
+        "items": [
+          "Networking",
+          "Operating Systems"
+        ]
+      }
+    ]
+  },
+  "blog": {
+    "heading": "Blogs",
+    "intro": "Write-ups of the things I build and what I learn while building them.",
+    "emptyHint": "New posts will appear here."
+  },
+  "stats": {
+    "heading": "Stats",
+    "intro": "Live activity and problem-solving stats from GitHub and LeetCode."
+  }
+}

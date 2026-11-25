@@ -501,6 +501,27 @@
 
 .post-nav .button { margin-top: 0; }
 
+.back-top-btn {
+  background: var(--forest);
+  color: var(--sage);
+  border: 1px solid var(--moss);
+}
+
+.back-top-btn:hover {
+  background: var(--lime);
+  color: var(--bg);
+}
+
+.post-end-gif {
+  display: block;
+  border-radius: 10px;
+  width: min(50%, 340px);
+  margin-top: 20px;
+  margin-bottom: 1rem;
+}
+
+.post img { max-width: 100%; height: auto; }
+
 /* ---------- Footer: reading progress ---------- */
 .progress {
   display: flex;
